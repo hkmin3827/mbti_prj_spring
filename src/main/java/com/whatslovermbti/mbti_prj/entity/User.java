@@ -21,7 +21,7 @@ public class User {
 
     @Column(nullable = false)
     private Provider provider;   // 로그인 종류 (Local/google/kakao/naver)
-    private String providerId;   // 필수. 소셜 로그인 고유값
+    private String oauthId;   // 필수. 소셜 로그인 고유값
 
     private String mbti;
     private String partnerMbti;   // 상대 MBTI (옵션)

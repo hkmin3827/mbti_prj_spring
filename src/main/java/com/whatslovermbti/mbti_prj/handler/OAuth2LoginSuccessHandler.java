@@ -18,6 +18,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final JwtProvider jwtProvider;
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,

@@ -1,9 +1,11 @@
 package com.whatslovermbti.mbti_prj.service;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.constant.Provider;
 import com.whatslovermbti.mbti_prj.constant.Role;
 import com.whatslovermbti.mbti_prj.dto.auth.LoginReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.SignUpReqDto;
+import com.whatslovermbti.mbti_prj.dto.oauth.OAuthUserInfo;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.UserRepository;
@@ -28,6 +30,8 @@ public class UserService {
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setProvider(Provider.LOCAL);
+        user.setPartnerMbti(dto.getPartnerMbti());
         user.setName(dto.getName());
         user.setMbti(dto.getMbti());
         user.setRole(Role.USER);
@@ -47,6 +51,23 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public User signupOrLoginOAuth(OAuthUserInfo info) {
+        return userRepository
+                .findByProviderAndOauthId(
+                        info.getProvider(),
+                        info.getProviderId()
+                )
+                .orElseGet(() -> {
+                    User user = new User();
+                    user.setProvider(info.getProvider());
+                    user.setOauthId(info.getProviderId());
+                    user.setEmail(info.getEmail()); // null 허용
+                    user.setName(info.getName());
+                    user.setRole(Role.USER);
+                    return userRepository.save(user);
+                });
     }
 }
 

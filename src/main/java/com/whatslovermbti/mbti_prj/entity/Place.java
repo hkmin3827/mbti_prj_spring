@@ -34,7 +34,16 @@ public class Place {
 
     private String naverReservationUrl;
 
+    // 중간 연결 엔티티
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<PlaceKeyword> placeKeywords = new ArrayList<>();
+
+    // 키워드 추출 메서드
+    @Transient
+    public List<Keyword> getKeywords() {
+        return placeKeywords.stream()
+                .map(PlaceKeyword::getKeyword)
+                .toList();
+    }
 
 }
