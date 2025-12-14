@@ -1,6 +1,12 @@
 package com.whatslovermbti.mbti_prj.handler;
 
+import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.jwt.JwtProvider;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.GoogleOAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.KakaoOAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.NaverOAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
+import com.whatslovermbti.mbti_prj.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +23,8 @@ import java.util.Map;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
+    private final UserService userService;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
@@ -29,54 +35,54 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> attributes = oauth2User.getAttributes();
 
-        String provider;
-        String providerId;
-        String email = null;
-        String nickname = null;
+        // 1️⃣ Provider 판별 + OAuthUserInfo 생성
+        OAuthUserInfo oAuthUserInfo = resolveOAuthUserInfo(attributes);
 
-        // ✅ 카카오
-        if (attributes.containsKey("kakao_account")) {
-            provider = "KAKAO";
-            providerId = attributes.get("id").toString();
+        // 2️⃣ 이미 검증된 OAuth 정보로 User 생성 or 조회
+        User user = userService.signupOrLoginOAuth(oAuthUserInfo);
 
-            Map<String, Object> kakaoAccount =
-                    (Map<String, Object>) attributes.get("kakao_account");
-
-            Map<String, Object> profile =
-                    (Map<String, Object>) kakaoAccount.get("profile");
-
-            nickname = (String) profile.get("nickname");
-            email = (String) kakaoAccount.get("email"); // 대부분 null
-        }
-        else if (attributes.containsKey("response")) {
-            provider = "NAVER";
-
-            Map<String, Object> responseMap =
-                    (Map<String, Object>) attributes.get("response");
-
-            providerId = responseMap.get("id").toString();
-            email = (String) responseMap.get("email");
-            nickname = (String) responseMap.get("name");
-        }
-        // ✅ 구글
-        else{
-            provider = "GOOGLE";
-            providerId = attributes.get("sub").toString();
-            email = (String) attributes.get("email");
-            nickname = (String) attributes.get("name");
-        }
-
-        // 🔑 OAuth 전용 JWT 발급 (provider + providerId 기준)
-        String token = jwtProvider.createOAuthToken(provider, providerId);
+        // 3️⃣ ✅ userId 기준 JWT 발급 (이게 핵심)
+        String token = jwtProvider.createToken(user.getId());
 
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("""
             {
+              "id": %d,
+              "email": "%s",
               "provider": "%s",
-              "providerId": "%s",
-              "nickname": "%s",
+              "oauthId": "%s",
               "token": "%s"
             }
-        """.formatted(provider, providerId, nickname, token));
+        """.formatted(
+                user.getId(),
+                user.getEmail(),
+                user.getProvider(),
+                user.getOauthId(),
+                token
+        ));
+    }
+
+    /**
+     * provider별 OAuthUserInfo 매핑
+     * OIDC 여부와 완전히 분리됨
+     */
+    private OAuthUserInfo resolveOAuthUserInfo(Map<String, Object> attributes) {
+
+        // GOOGLE (OIDC 포함)
+        if (attributes.containsKey("sub")) {
+            return new GoogleOAuthUserInfo(attributes);
+        }
+
+        // KAKAO
+        if (attributes.containsKey("kakao_account")) {
+            return new KakaoOAuthUserInfo(attributes);
+        }
+
+        // NAVER
+        if (attributes.containsKey("response")) {
+            return new NaverOAuthUserInfo(attributes);
+        }
+
+        throw new IllegalStateException("Unsupported OAuth provider");
     }
 }

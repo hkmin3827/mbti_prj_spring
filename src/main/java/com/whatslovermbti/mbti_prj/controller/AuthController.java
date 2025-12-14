@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.controller;
 
+import com.whatslovermbti.mbti_prj.annotation.LoginUser;
 import com.whatslovermbti.mbti_prj.dto.auth.LoginReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.SignUpReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.TokenResDto;
@@ -9,6 +10,7 @@ import com.whatslovermbti.mbti_prj.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,11 +40,4 @@ public class AuthController {
 
     }
 
-
-
-    // 로그인 정보 필요한 컨트롤러 마다 넣어주기
-//    @GetMapping("/me")
-//    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal CustomUserDetails user) {
-//        return ResponseEntity.ok(new UserResponse(user.getUser()));
-//    }
 }

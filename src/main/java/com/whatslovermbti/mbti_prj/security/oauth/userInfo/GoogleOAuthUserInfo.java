@@ -1,4 +1,4 @@
-package com.whatslovermbti.mbti_prj.dto.oauth;
+package com.whatslovermbti.mbti_prj.security.oauth.userInfo;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
 
@@ -12,8 +12,8 @@ public class GoogleOAuthUserInfo implements OAuthUserInfo {
         this.attributes = attributes;
     }
     @Override
-    public String getProviderId(){
-        return (String) attributes.get("id");
+    public String getProviderId() {
+        return attributes.get("sub").toString();
     }
 
     @Override

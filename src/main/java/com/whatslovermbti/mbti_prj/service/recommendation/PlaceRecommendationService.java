@@ -1,10 +1,15 @@
 package com.whatslovermbti.mbti_prj.service.recommendation;
 
+import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
-import com.whatslovermbti.mbti_prj.entity.Keyword;
+import com.whatslovermbti.mbti_prj.dto.place.PlaceResDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.User;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoCategoryMapper;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapClient;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import com.whatslovermbti.mbti_prj.repository.PlaceRepository;
+import com.whatslovermbti.mbti_prj.service.place.PlaceMapper;
 import com.whatslovermbti.mbti_prj.service.weight.MbtiKeywordWeightService;
 import com.whatslovermbti.mbti_prj.util.RandomPicker;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +64,41 @@ public class PlaceRecommendationService {
                 .collect(Collectors.toList());
     }
 
+    private static final int MAX_RADIUS = 5000;
+
+    private final KakaoMapClient kakaoMapClient;
+    private final PlaceMapper placeMapper;
+
+    public List<PlaceResDto> recommendNearby(double lat, double lng, int radius, Category requestCategory) {
+        int safeRadius = Math.min(radius, MAX_RADIUS);
+
+        String kakaoCode =
+                KakaoCategoryMapper.toKakaoCode(requestCategory);
+
+        KakaoMapResponse response =
+                kakaoMapClient.searchNearby(lat, lng, safeRadius, kakaoCode);
+
+
+        if (response == null || response.getDocuments() == null) return List.of();
+
+        return response.getDocuments().stream()
+                .map(doc -> {
+                    // "결과 category"
+                    Category resultCategory =
+                            KakaoCategoryMapper.fromCategoryName(
+                                    doc.getCategoryName()
+                            );
+
+                    return placeMapper.fromKakao(
+                            doc,
+                            resultCategory,
+                            List.of(),   // 키워드 매핑
+                            0.0           // 거리 계산
+                    );
+                })
+                .toList();
+    }
+
     private double calculatePlaceScore(
             User user,
             Place place,
@@ -74,4 +114,5 @@ public class PlaceRecommendationService {
                 )
                 .sum();
     }
+
 }

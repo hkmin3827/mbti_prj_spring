@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.controller;
 
 
+import com.whatslovermbti.mbti_prj.annotation.LoginUser;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.User;
@@ -22,10 +23,10 @@ public class RecommendationController {
 
     @GetMapping("/places")
     public List<Place> recommendPlaces(
-            @RequestParam MbtiContext context
-            // @AuthenticationPrincipal User user  ← 나중에
+            @LoginUser User user,
+            @RequestParam MbtiContext context,
+            @RequestParam(defaultValue = "20") int limit
     ) {
-        User user = null; // TODO: 로그인 연동 후 교체
-        return placeRecommendationService.recommendPlaces(user, context, 20);
+        return placeRecommendationService.recommendPlaces(user, context, limit);
     }
 }

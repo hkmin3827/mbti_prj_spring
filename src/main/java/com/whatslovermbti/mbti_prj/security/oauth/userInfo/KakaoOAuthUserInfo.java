@@ -1,4 +1,4 @@
-package com.whatslovermbti.mbti_prj.dto.oauth;
+package com.whatslovermbti.mbti_prj.security.oauth.userInfo;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
 

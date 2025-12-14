@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.security.oauth;
 
 import com.whatslovermbti.mbti_prj.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class CustomOAuth2User implements OAuth2User {
 
     private final User user;

@@ -1,9 +1,9 @@
 package com.whatslovermbti.mbti_prj.security.oauth;
 
-import com.whatslovermbti.mbti_prj.dto.oauth.GoogleOAuthUserInfo;
-import com.whatslovermbti.mbti_prj.dto.oauth.KakaoOAuthUserInfo;
-import com.whatslovermbti.mbti_prj.dto.oauth.NaverOAuthUserInfo;
-import com.whatslovermbti.mbti_prj.dto.oauth.OAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.GoogleOAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.KakaoOAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.NaverOAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.service.UserService;
 import lombok.RequiredArgsConstructor;

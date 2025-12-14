@@ -42,7 +42,10 @@ public class SecurityConfig {
                                 "/",
                                 "/login",
                                 "/oauth2/**",
-                                "/login/oauth2/**"
+                                "/login/oauth2/**",
+                                "/api/places/**",
+                                "/api/users/**",
+                                "/api/recommend/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

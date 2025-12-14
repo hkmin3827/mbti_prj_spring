@@ -32,7 +32,7 @@ public class Place {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String naverReservationUrl;
+    private String mapPlaceId;   // 카카오 PlaceId
 
     // 중간 연결 엔티티
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)

@@ -5,7 +5,7 @@ import com.whatslovermbti.mbti_prj.constant.Provider;
 import com.whatslovermbti.mbti_prj.constant.Role;
 import com.whatslovermbti.mbti_prj.dto.auth.LoginReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.SignUpReqDto;
-import com.whatslovermbti.mbti_prj.dto.oauth.OAuthUserInfo;
+import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.UserRepository;

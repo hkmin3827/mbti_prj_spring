@@ -7,7 +7,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice // (전역 예외 처리)
 public class GlobalExceptionHandler {
 
     // 공통 에러 응답 객체

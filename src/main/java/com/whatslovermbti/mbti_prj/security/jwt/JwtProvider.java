@@ -1,5 +1,5 @@
 package com.whatslovermbti.mbti_prj.security.jwt;
-
+// 토큰 생성/ 검증
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,7 +20,7 @@ public class JwtProvider {
     public String createToken(Long userId) {
         String secret = jwtProperties.getSecret();
         return Jwts.builder()
-                .claim("userId", userId)
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
@@ -48,6 +48,6 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        return claims.get("userId", Long.class);
+        return Long.valueOf(claims.getSubject());
     }
 }

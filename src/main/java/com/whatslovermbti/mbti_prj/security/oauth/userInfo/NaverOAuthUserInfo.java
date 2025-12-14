@@ -1,4 +1,4 @@
-package com.whatslovermbti.mbti_prj.dto.oauth;
+package com.whatslovermbti.mbti_prj.security.oauth.userInfo;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
 
@@ -8,7 +8,7 @@ public class NaverOAuthUserInfo implements OAuthUserInfo{
     private final Map<String, Object> attributes;
 
     public NaverOAuthUserInfo(Map<String, Object> attributes) {
-        this.attributes = attributes;
+        this.attributes = (Map<String, Object>) attributes.get("response");
     }
 
     @Override
@@ -18,7 +18,7 @@ public class NaverOAuthUserInfo implements OAuthUserInfo{
 
     @Override
     public String getProviderId() {
-        return String.valueOf(attributes.get("id"));
+        return attributes.get("id").toString(); // ✅ 네이버 고유 ID
     }
 
     @Override
