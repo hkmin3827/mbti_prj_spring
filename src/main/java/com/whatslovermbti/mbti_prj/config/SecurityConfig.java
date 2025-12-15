@@ -4,15 +4,12 @@ import com.whatslovermbti.mbti_prj.handler.OAuth2LoginSuccessHandler;
 import com.whatslovermbti.mbti_prj.security.jwt.JwtAuthenticationFilter;
 import com.whatslovermbti.mbti_prj.security.jwt.JwtProvider;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetailsService;
-import com.whatslovermbti.mbti_prj.security.oauth.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,8 +24,6 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final JwtProvider jwtProvider;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -64,9 +59,6 @@ public class SecurityConfig {
                         new JwtAuthenticationFilter(jwtProvider, customUserDetailsService),
                         UsernamePasswordAuthenticationFilter.class
                 ).oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(userInfo ->
-                                userInfo.userService(customOAuth2UserService)
-                        )
                         .successHandler(oAuth2LoginSuccessHandler)
                 );
 

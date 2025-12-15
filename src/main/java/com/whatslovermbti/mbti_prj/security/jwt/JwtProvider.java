@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -26,17 +27,6 @@ public class JwtProvider {
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
-
-    public String createOAuthToken(String provider, String providerId) {
-        String secret = jwtProperties.getSecret();
-        return Jwts.builder()
-                .setSubject(provider + "_" + providerId)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
 
     public Long getUserId(String token) {
         String secret = jwtProperties.getSecret();

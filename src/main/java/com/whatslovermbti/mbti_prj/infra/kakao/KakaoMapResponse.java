@@ -2,15 +2,64 @@ package com.whatslovermbti.mbti_prj.infra.kakao;
 // 카카오 맵에서 내려주는 JSON을 자바 객체로 받음
 // 서비스로직에서 이걸 거리 계산, Category 매핑, 키워드 매핑, PlaceResDto로 변환
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.whatslovermbti.mbti_prj.infra.kakao.dto.KakaoKeywordResponse;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class KakaoMapResponse {
 
     private List<Document> documents;
     private Meta meta;
+
+    /* ==============================
+       keyword 응답 → 공통 응답 변환
+       ============================== */
+    public static KakaoMapResponse from(KakaoKeywordResponse keywordResponse) {
+
+        KakaoMapResponse response = new KakaoMapResponse();
+
+        response.documents = keywordResponse.getDocuments().stream()
+                .map(doc -> {
+                    Document d = new Document();
+                    d.placeName = doc.getPlace_name();
+                    d.categoryName = doc.getCategory_name();
+                    d.addressName = doc.getAddress_name();
+                    d.roadAddressName = doc.getRoad_address_name();
+                    d.longitude = doc.getX();
+                    d.latitude = doc.getY();
+                    return d;
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        Meta meta = new Meta();
+        meta.totalCount = keywordResponse.getMeta().getTotal_count();
+        meta.isEnd = keywordResponse.getMeta().is_end();
+
+        response.meta = meta;
+        return response;
+    }
+
+    /* ==============================
+       카테고리 필터
+       ============================== */
+    public void filterByCategory(String categoryKeyword) {
+        if (categoryKeyword == null || categoryKeyword.isBlank()) return;
+
+        this.documents = this.documents.stream()
+                .filter(doc ->
+                        doc.getCategoryName() != null &&
+                                doc.getCategoryName().contains(categoryKeyword)
+                )
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public void applyDocuments(List<Document> newDocs) {
+        this.documents = new ArrayList<>(newDocs);
+    }
 
     @Getter
     public static class Document {

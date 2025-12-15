@@ -17,9 +17,16 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         SimpleCacheManager manager = new SimpleCacheManager();
 
+        ConcurrentMapCache kakaoPlaceCache =
+                new ConcurrentMapCache("kakaoPlaceCache");
+
+        ConcurrentMapCache kakaoCandidateCache =
+                new ConcurrentMapCache("kakaoCandidateCache");
+
+
         manager.setCaches(List.of(
-                new ConcurrentMapCache("kakaoPlaceCache"),   // nearby
-                new ConcurrentMapCache("kakaoKeywordCache")  // keyword
+                kakaoPlaceCache,
+                kakaoCandidateCache
         ));
 
         return manager;

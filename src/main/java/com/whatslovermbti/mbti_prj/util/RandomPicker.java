@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -14,20 +15,25 @@ public class RandomPicker {
     }
 
     public static <T> List<T> pickTopWithRandom(
-            List<T> list,
+            List<T> source,
             int topN,
-            int randomCount
+            int randomCount,
+            int limit
     ) {
-        if (list.size() <= topN) {
-            return list;
+        if (source == null || source.isEmpty()) {
+            return List.of();
         }
 
-        List<T> top = list.subList(0, topN);
-        List<T> rest = list.subList(topN, list.size());
+        // 🔥 반드시 mutable
+        List<T> mutable = new ArrayList<>(source);
 
-        Collections.shuffle(rest);
-        top.addAll(rest.subList(0, Math.min(randomCount, rest.size())));
+        int effectiveTopN = Math.min(topN, mutable.size());
+        List<T> top = new ArrayList<>(mutable.subList(0, effectiveTopN));
 
-        return top;
+        Collections.shuffle(top);
+
+        return top.stream()
+                .limit(limit)
+                .toList(); // 결과는 불변이어도 OK
     }
 }

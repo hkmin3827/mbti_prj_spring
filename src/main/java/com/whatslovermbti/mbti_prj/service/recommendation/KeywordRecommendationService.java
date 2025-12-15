@@ -4,7 +4,9 @@ import com.whatslovermbti.mbti_prj.constant.ActionType;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.entity.Keyword;
 import com.whatslovermbti.mbti_prj.entity.User;
+import com.whatslovermbti.mbti_prj.entity.UserKeywordPreference;
 import com.whatslovermbti.mbti_prj.repository.UserKeywordActionRepository;
+import com.whatslovermbti.mbti_prj.repository.UserKeywordPreferenceRepository;
 import com.whatslovermbti.mbti_prj.service.weight.KeywordBehaviorWeightService;
 import com.whatslovermbti.mbti_prj.service.weight.MbtiKeywordWeightService;
 import lombok.RequiredArgsConstructor;
@@ -18,46 +20,53 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class KeywordRecommendationService {
-    private static final double MBTI_MIN_FLOOR = 5.0;
 
-    private final KeywordBehaviorWeightService behaviorWeightService;
+    private static final double MBTI_MIN_FLOOR = 1.5;
+
     private final MbtiKeywordWeightService mbtiKeywordWeightService;
-    private final UserKeywordActionRepository actionRepository;
+    private final UserKeywordPreferenceRepository preferenceRepository;
 
+    /**
+     * 유저 + 키워드 → 최종 점수
+     */
     public double calculateKeywordScore(
             User user,
-            Keyword keyword,
-            MbtiContext context
+            Keyword keyword
     ) {
-        // 1. 기준 MBTI 결정
-        String targetMbti = (context == MbtiContext.SELF)
-                ? user.getMbti()
-                : user.getPartnerMbti();
+        String targetMbti =
+                user.getPartnerMbti() != null
+                        ? user.getPartnerMbti()
+                        : user.getMbti();
 
-        // 2. MBTI 기본 가중치
+        // 1️⃣ MBTI 기본 가중치
         int baseWeight =
-                mbtiKeywordWeightService.getBaseWeight(targetMbti, keyword);
+                mbtiKeywordWeightService.getBaseWeight(
+                        targetMbti,
+                        keyword
+                );
 
         boolean isOpposite =
-                mbtiKeywordWeightService.isOpposite(targetMbti, keyword);
+                mbtiKeywordWeightService.isOpposite(
+                        targetMbti,
+                        keyword
+                );
 
-        // 3. 행동 가중치 계산
-        int click = actionRepository.countBy(user, keyword, ActionType.CLICK, context);
-        int like  = actionRepository.countBy(user, keyword, ActionType.LIKE, context);
-        int save  = actionRepository.countBy(user, keyword, ActionType.SAVE, context);
+        // 2️⃣ 유저 누적 선호
+        int userPreference =
+                preferenceRepository.findByUserAndKeyword(user, keyword)
+                        .map(UserKeywordPreference::getScore)
+                        .orElse(0);
 
-        double behaviorWeight =
-                behaviorWeightService.calculateBehaviorWeight(click, like, save);
+        // 3️⃣ AI 보정 (지금은 0, 추후 주입)
+        double aiBoost = 0.0;
 
-        // 4. 희석 적용
         double rawScore =
                 mbtiKeywordWeightService.applyDilution(
-                        baseWeight,
-                        behaviorWeight,
+                        baseWeight + userPreference + aiBoost,
+                        0.0,
                         isOpposite
                 );
 
-        // 5. MBTI 하한선 보장
         return Math.max(rawScore, MBTI_MIN_FLOOR);
     }
 }

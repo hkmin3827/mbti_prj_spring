@@ -2,12 +2,16 @@ package com.whatslovermbti.mbti_prj.controller;
 
 import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.dto.place.PlaceResDto;
+import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapClient;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import com.whatslovermbti.mbti_prj.infra.kakao.dto.KakaoKeywordResponse;
+import com.whatslovermbti.mbti_prj.repository.UserRepository;
+import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import com.whatslovermbti.mbti_prj.service.place.PlaceSearchService;
 import com.whatslovermbti.mbti_prj.service.recommendation.PlaceRecommendationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,40 +24,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaceController {
 
-    private final PlaceRecommendationService placeService;
     private final PlaceSearchService placeSearchService;
-    private final KakaoMapClient kakaoMapClient;
+    private final UserRepository userRepository;
 
-//    @GetMapping("/nearby")
-//    public List<PlaceResDto> nearby(
-//            @RequestParam double lat,
-//            @RequestParam double lng,
-//
-//            // ✅ 장소 종류를 명시적으로 받는다
-//            @RequestParam Category category,
-//
-//            // ✅ 기본값 + 1차 방어
-//            @RequestParam(defaultValue = "1000") int radius
-//    ) {
-//        return placeService.recommendNearby(
-//                lat,
-//                lng,
-//                radius,
-//                category
-//        );
-//    }
+    /**
+     * 통합 장소 검색
+     * - 위치 필수
+     * - keyword / category 선택
+     */
     @GetMapping("/search")
-    public KakaoKeywordResponse search(@RequestParam String keyword,
-                                       @RequestParam(defaultValue = "1") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
-        return placeSearchService.searchByKeyword(keyword, page, size);
-    }
+    public KakaoMapResponse search(
+            @AuthenticationPrincipal CustomUserDetails userDetails, // 🔥 핵심
+            @RequestParam double lat,
+            @RequestParam double lng,
+            @RequestParam(defaultValue = "1500") int radius,
+            @RequestParam(required = false) String categoryCode,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        // 1️⃣ JWT에서 userId 복원
+        User user = userRepository.findById(userDetails.getUser().getId())
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
-    @GetMapping("/nearby")
-    public KakaoMapResponse nearby(@RequestParam double lat,
-                                   @RequestParam double lng,
-                                   @RequestParam(defaultValue = "500") int radius,
-                                   @RequestParam(defaultValue = "FD6") String categoryCode) {
-        return placeSearchService.searchNearby(lat, lng, radius, categoryCode);
+        // 2️⃣ 추천 검색
+        return placeSearchService.search(
+                user,
+                lat,
+                lng,
+                radius,
+                categoryCode,
+                size
+        );
     }
 }

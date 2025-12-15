@@ -1,118 +1,54 @@
 package com.whatslovermbti.mbti_prj.service.recommendation;
 
-import com.whatslovermbti.mbti_prj.constant.Category;
-import com.whatslovermbti.mbti_prj.constant.MbtiContext;
-import com.whatslovermbti.mbti_prj.dto.place.PlaceResDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.User;
-import com.whatslovermbti.mbti_prj.infra.kakao.KakaoCategoryMapper;
-import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapClient;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
-import com.whatslovermbti.mbti_prj.repository.PlaceRepository;
-import com.whatslovermbti.mbti_prj.service.place.PlaceMapper;
-import com.whatslovermbti.mbti_prj.service.weight.MbtiKeywordWeightService;
 import com.whatslovermbti.mbti_prj.util.RandomPicker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+// 유저에게 이 후보군 중 무엇을, 어떤 비율로 보여줄 것인가
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PlaceRecommendationService {
-    private static final int TOP_N = 10;
+
+    private static final int TOP_N = 20;
     private static final int RANDOM_COUNT = 5;
 
-    private final PlaceRepository placeRepository;
     private final KeywordRecommendationService keywordRecommendationService;
-    private final MbtiKeywordWeightService mbtiKeywordWeightService;
 
-    // 정렬을 위한 내부 클래스
-    private record PlaceScore(Place place, double score) {}
-    /**
-     * 장소 추천 메인 진입점
-     */
-    public List<Place> recommendPlaces(
+    public List<KakaoMapResponse.Document> recommend(
             User user,
-            MbtiContext context,
+            List<KakaoMapResponse.Document> candidates,
             int limit
     ) {
-        List<PlaceScore> scoredPlaces =
-                placeRepository.findAll().stream()
-                        .map(place -> new PlaceScore(
-                                place,
-                                calculatePlaceScore(user, place, context)
-                        ))
-                        .sorted(Comparator.comparingDouble(PlaceScore::score).reversed())
-                        .collect(Collectors.toList());
+        List<KakaoMapResponse.Document> sorted =
+                candidates.stream()
+                        .sorted(Comparator.comparingDouble(
+                                (KakaoMapResponse.Document doc) -> calculateDocumentScore(user, doc)
+                        ).reversed())
+                        .toList();
 
-        // 1. Place만 추출 (정렬된 상태)
-        List<Place> sortedPlaces = scoredPlaces.stream()
-                .map(PlaceScore::place)
-                .collect(Collectors.toList());
-
-        // 2. 랜덤 섞기 적용
-        List<Place> mixed =
-                RandomPicker.pickTopWithRandom(sortedPlaces, TOP_N, RANDOM_COUNT);
-
-        // 3. limit 적용
-        return mixed.stream()
-                .limit(limit)
-                .collect(Collectors.toList());
+        return RandomPicker.pickTopWithRandom(
+                sorted,
+                TOP_N,
+                RANDOM_COUNT,
+                limit
+        );
     }
 
-    private static final int MAX_RADIUS = 5000;
-
-    private final KakaoMapClient kakaoMapClient;
-    private final PlaceMapper placeMapper;
-
-    public List<PlaceResDto> recommendNearby(double lat, double lng, int radius, Category requestCategory) {
-        int safeRadius = Math.min(radius, MAX_RADIUS);
-
-        String kakaoCode =
-                KakaoCategoryMapper.toKakaoCode(requestCategory);
-
-        KakaoMapResponse response =
-                kakaoMapClient.searchNearby(lat, lng, safeRadius, kakaoCode);
-
-
-        if (response == null || response.getDocuments() == null) return List.of();
-
-        return response.getDocuments().stream()
-                .map(doc -> {
-                    // "결과 category"
-                    Category resultCategory =
-                            KakaoCategoryMapper.fromCategoryName(
-                                    doc.getCategoryName()
-                            );
-
-                    return placeMapper.fromKakao(
-                            doc,
-                            resultCategory,
-                            List.of(),   // 키워드 매핑
-                            0.0           // 거리 계산
-                    );
-                })
-                .toList();
-    }
-
-    private double calculatePlaceScore(
+    private double calculateDocumentScore(
             User user,
-            Place place,
-            MbtiContext context
+            KakaoMapResponse.Document doc
     ) {
-        return place.getKeywords().stream()
-                .mapToDouble(keyword ->
-                        keywordRecommendationService.calculateKeywordScore(
-                                user,
-                                keyword,
-                                context
-                        )
-                )
-                .sum();
-    }
+        // ⚠️ 아직 Place/Keyword 매핑 전이므로
+        // 지금은 "기본 점수"만 두거나
+        // categoryName, placeName 기반 임시 점수 가능
 
+        return 1.0; // ← 지금 단계에선 이게 정상
+    }
 }

@@ -21,7 +21,11 @@ public class KakaoMapClient {
     private String apiKey;
 
     // infra는 PlaceResDto를 만들지 않는다. 응답 객체만 반환한다.
-    public KakaoMapResponse searchNearby(
+
+    /* ==============================
+       카테고리 + 위치 검색
+       ============================== */
+    public KakaoMapResponse searchByCategory(
             double lat,
             double lng,
             int radius,
@@ -42,46 +46,36 @@ public class KakaoMapClient {
                 .block();
     }
 
-    // 카테고리별 검색
-    public KakaoMapResponse searchNearbyByCategory(
+    /* ==============================
+     키워드 + 위치 검색
+     ============================== */
+    public KakaoMapResponse searchByKeywordWithLocation(
+            String keyword,
             double lat,
             double lng,
             int radius,
-            String categoryCode
+            int page,
+            int size
     ) {
-        return kakaoWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/local/search/category.json")
-                        .queryParam("category_group_code", categoryCode)
-                        .queryParam("x", lng)
-                        .queryParam("y", lat)
-                        .queryParam("radius", radius)
-                        .queryParam("sort", "distance")
-                        .build())
-                .header("Authorization", "KakaoAK " + apiKey)
-                .retrieve()
-                .bodyToMono(KakaoMapResponse.class)
-                .block();
-    }
+        if (keyword == null || keyword.isBlank()) {
+            throw new IllegalArgumentException("Kakao keyword search requires non-empty keyword");
+        }
 
-
-
-    private static final String KAKAO_MAP_BASE_URL =
-            "https://dapi.kakao.com/v2/local/search/keyword.json";
-
-    private final KakaoMapProperties properties;
-
-    public KakaoKeywordResponse searchByKeyword(String keyword, int page, int size) {
         return kakaoWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/search/keyword.json")
                         .queryParam("query", keyword)
+                        .queryParam("x", lng)
+                        .queryParam("y", lat)
+                        .queryParam("radius", radius)
                         .queryParam("page", page)
                         .queryParam("size", size)
-                        .build())
+                        .build()
+                )
                 .retrieve()
-                .bodyToMono(KakaoKeywordResponse.class)
+                .bodyToMono(KakaoMapResponse.class)
                 .block();
     }
+
 }
 

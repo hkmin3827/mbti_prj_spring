@@ -21,12 +21,12 @@ public class RecommendationController {
 
     private final PlaceRecommendationService placeRecommendationService;
 
-    @GetMapping("/places")
-    public List<Place> recommendPlaces(
-            @LoginUser User user,
-            @RequestParam MbtiContext context,
-            @RequestParam(defaultValue = "20") int limit
-    ) {
-        return placeRecommendationService.recommendPlaces(user, context, limit);
-    }
+//    @GetMapping("/places")
+//    public List<Place> recommendPlaces(
+//            @LoginUser User user,
+//            @RequestParam MbtiContext context,
+//            @RequestParam(defaultValue = "20") int limit
+//    ) {
+//        return placeRecommendationService.recommendPlaces(user, context, limit);
+//    }
 }

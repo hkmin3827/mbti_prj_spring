@@ -16,6 +16,4 @@ public class UserResDto {
     private String name;
     private String oauthId;
     private Long id;
-
-
 }

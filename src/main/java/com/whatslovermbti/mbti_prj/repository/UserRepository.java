@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             String oauthId
     );
 
+    Optional<User> findById(Long Id);
 }
