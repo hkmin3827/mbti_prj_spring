@@ -1,14 +1,12 @@
 package com.whatslovermbti.mbti_prj.entity;
+// 클릭한 플레이스 (CLICK)
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
-public class Review {
+public class PlaceViewHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,19 +18,16 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     private Place place;
 
-    private int rating;
-
-    @Column(columnDefinition = "TEXT")
-    private String content;
-
-    private boolean verified; // 영수증 인증 여부
-
-    private String receiptImageUrl;
-
-    private LocalDateTime createAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime viewedAt;
     @PrePersist
+
     public void onCreate() {
-    this.createAt = LocalDateTime.now();
+        this.viewedAt = LocalDateTime.now();
     }
 
+    public PlaceViewHistory(User user, Place place) {
+        this.user = user;
+        this.place = place;
+    }
 }

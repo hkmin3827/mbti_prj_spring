@@ -1,7 +1,9 @@
 package com.whatslovermbti.mbti_prj.constant;
 
 public enum ActionType {
-    CLICK,
+    VIEW,
     LIKE,
-    SAVE
+    DISLIKE,
+    SAVE,
+    UNSAVE
 }

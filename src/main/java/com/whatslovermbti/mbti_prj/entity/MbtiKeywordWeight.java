@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-// MBTI 취향 가중치 : 초기 추천설정에 필요. 추후 좋아요/싫어요 기반으로 키워드선호도 조정
+// MBTI 기반 초기 가중치 : 초기 추천설정에 필요. 추후 좋아요/싫어요 기반으로 키워드선호도 조정
 @Entity
 @Getter
 @Setter

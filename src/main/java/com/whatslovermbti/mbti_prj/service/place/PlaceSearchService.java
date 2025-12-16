@@ -41,6 +41,7 @@ public class PlaceSearchService {
             String categoryCode,
             int size
     ) {
+
         // 1️⃣ 후보군 (캐시된 Kakao 결과)
         KakaoMapResponse response =
                 placeCandidateService.searchCandidates(

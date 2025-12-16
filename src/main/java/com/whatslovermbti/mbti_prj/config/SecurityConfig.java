@@ -34,14 +34,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
-                                "/",
-                                "/login",
+//                                "/",
+//                                "/login",
                                 "/oauth2/**",
-                                "/login/oauth2/**",
+                                "/login/oauth2/**"
+                        ).permitAll()
+                        .requestMatchers(
                                 "/api/places/**",
                                 "/api/users/**",
-                                "/api/recommend/**"
-                        ).permitAll()
+                                "/api/recommend/**",
+                                "/api/views/**",
+                                "/api/reactions/**",
+                                "/api/bookmarks/**",
+                                "/api/keywords/**"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
 
