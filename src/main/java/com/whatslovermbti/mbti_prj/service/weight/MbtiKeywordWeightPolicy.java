@@ -20,18 +20,6 @@ public class MbtiKeywordWeightService {
     private final MbtiKeywordWeightRepository repository;
 
     /**
-     * MBTI + Keyword → 선천 기본 가중치
-     */
-    public int getBaseWeight(String mbti, Keyword keyword) {
-        Set<String> axes = MbtiAxisUtil.parseAxes(mbti).keySet();
-
-        return repository.findByMbtiAxisIn(axes).stream()
-                .filter(w -> w.getKeyword().getId().equals(keyword.getId()))
-                .mapToInt(MbtiKeywordWeight::getWeight)
-                .sum();
-    }
-
-    /**
      * MBTI + Keyword → 반대 성향 여부
      */
     public boolean isOpposite(String mbti, Keyword keyword) {
