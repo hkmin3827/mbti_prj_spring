@@ -9,6 +9,7 @@ import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User signupOrLoginOAuth(OAuthUserInfo info) {
         return userRepository
                 .findByProviderAndOauthId(
@@ -68,6 +70,15 @@ public class UserService {
                     user.setRole(Role.USER);
                     return userRepository.save(user);
                 });
+    }
+
+    @Transactional
+    public void withdraw(User user) {
+        if (!userRepository.existsById(user.getId())) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        userRepository.delete(user);
     }
 }
 
