@@ -25,8 +25,12 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = true)
+    private String reviewImageUrl;
+
     private boolean verified; // 영수증 인증 여부
 
+    @Column(nullable = true)
     private String receiptImageUrl;
 
     private LocalDateTime createAt;

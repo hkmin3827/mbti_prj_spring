@@ -6,7 +6,7 @@ import com.whatslovermbti.mbti_prj.security.oauth.userInfo.GoogleOAuthUserInfo;
 import com.whatslovermbti.mbti_prj.security.oauth.userInfo.KakaoOAuthUserInfo;
 import com.whatslovermbti.mbti_prj.security.oauth.userInfo.NaverOAuthUserInfo;
 import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
-import com.whatslovermbti.mbti_prj.service.UserService;
+import com.whatslovermbti.mbti_prj.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
-    private final UserService userService;
+    private final AuthService authService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -39,7 +39,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         OAuthUserInfo oAuthUserInfo = resolveOAuthUserInfo(attributes);
 
         // 이미 검증된 OAuth 정보로 User 생성 or 조회
-        User user = userService.signupOrLoginOAuth(oAuthUserInfo);
+        User user = authService.signupOrLoginOAuth(oAuthUserInfo);
 
         // userId 기준 JWT 발급
         String token = jwtProvider.createToken(user.getId());

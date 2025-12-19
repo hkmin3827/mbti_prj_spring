@@ -46,7 +46,10 @@ public class SecurityConfig {
                                 "/api/views/**",
                                 "/api/reactions/**",
                                 "/api/bookmarks/**",
-                                "/api/keywords/**"
+                                "/api/keywords/**",
+                                "/api/test/ocr/**",
+                                "/api/s3/**",
+                                "/api/reviews/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )

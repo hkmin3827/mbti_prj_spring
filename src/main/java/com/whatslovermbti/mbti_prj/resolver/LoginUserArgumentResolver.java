@@ -1,6 +1,8 @@
 package com.whatslovermbti.mbti_prj.resolver;
 
 import com.whatslovermbti.mbti_prj.annotation.LoginUser;
+import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -31,11 +33,12 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return null; // 인증 정보 없음
+        if (authentication == null
+                || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userDetails.getUser().getId(); // ⭐ 로그인 유저의 userId 반환
+        return userDetails.getUser().getId(); // 로그인 유저의 userId 반환
     }
 }

@@ -19,6 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaceSearchService {
 
+    private static final int DEFAULT_RADIUS = 1500;
+
     private final PlaceCandidateService placeCandidateService;
     private final PlaceRecommendationService placeRecommendationService;
 
@@ -35,32 +37,34 @@ public class PlaceSearchService {
      */
     public KakaoMapResponse search(
             User user,
+            String mbti,
             double lat,
             double lng,
-            int radius,
             String categoryCode,
             int size
     ) {
 
         // 1️⃣ 후보군 (캐시된 Kakao 결과)
-        KakaoMapResponse response =
+        List<KakaoMapResponse.Document> candidates =
                 placeCandidateService.searchCandidates(
                         user,
+                        mbti,
                         lat,
                         lng,
-                        radius,
+                        DEFAULT_RADIUS,
                         categoryCode
                 );
 
         // 2️⃣ Kakao → Place 변환은 이미 되어 있다고 가정
-        List<KakaoMapResponse.Document> recommended =
-                placeRecommendationService.recommend(
+        List<KakaoMapResponse.Document> picked =
+                placeRecommendationService.recommendFromCandidates(
                         user,
-                        response.getDocuments(),
+                        candidates,
                         size
                 );
 
-        response.applyDocuments(recommended);
+        KakaoMapResponse response = new KakaoMapResponse();
+        response.applyDocuments(picked);
         return response;
     }
 }

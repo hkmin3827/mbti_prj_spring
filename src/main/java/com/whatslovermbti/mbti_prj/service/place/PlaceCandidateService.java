@@ -28,10 +28,11 @@ public class PlaceCandidateService {
 
     @Cacheable(
             value = "kakaoCandidateCache",
-            key = "'candidate:' + #user.id + ':' + #user.mbti + ':' + #lat + ':' + #lng + ':' + #radius + ':' + #categoryCode"
+            key = "'candidate:' + #user.id + ':' + #mbti + ':' + #lat + ':' + #lng + ':' + #radius + ':' + #categoryCode"
     )
-    public KakaoMapResponse searchCandidates(
+    public List<KakaoMapResponse.Document> searchCandidates(
             User user,
+            String mbti,
             double lat,
             double lng,
             int radius,
@@ -45,12 +46,7 @@ public class PlaceCandidateService {
            1️⃣ category 기반 1차 후보군
            ============================ */
         KakaoMapResponse categoryResp =
-                kakaoMapClient.searchByCategory(
-                        lat,
-                        lng,
-                        radius,
-                        categoryCode
-                );
+                kakaoMapClient.searchByCategory(lat, lng, radius, categoryCode);
 
         for (KakaoMapResponse.Document d : categoryResp.getDocuments()) {
             merged.putIfAbsent(d.getPlaceName(), d);
@@ -60,17 +56,12 @@ public class PlaceCandidateService {
            2️⃣ (선택) 키워드 기반 확장
            ============================ */
         List<String> keywords =
-                keywordWeightAggregator.getTopKeywordNames(user, KEYWORD_LIMIT);
+                keywordWeightAggregator.getTopKeywordNames(user, mbti, KEYWORD_LIMIT);
 
         for (String keyword : keywords) {
             KakaoMapResponse keywordResp =
                     kakaoMapClient.searchByKeywordWithLocation(
-                            keyword,
-                            lat,
-                            lng,
-                            radius,
-                            1,
-                            PAGE_SIZE
+                            keyword, lat, lng, radius, 1, PAGE_SIZE
                     );
 
             for (KakaoMapResponse.Document d : keywordResp.getDocuments()) {
@@ -81,8 +72,6 @@ public class PlaceCandidateService {
         /* ============================
            3️⃣ 공통 응답 생성
            ============================ */
-        KakaoMapResponse result = new KakaoMapResponse();
-        result.applyDocuments(new ArrayList<>(merged.values()));
-        return result;
+        return new ArrayList<>(merged.values());
     }
 }

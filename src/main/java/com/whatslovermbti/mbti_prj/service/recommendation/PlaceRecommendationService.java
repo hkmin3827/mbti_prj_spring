@@ -1,8 +1,10 @@
 package com.whatslovermbti.mbti_prj.service.recommendation;
 
+import com.whatslovermbti.mbti_prj.dto.place.PlaceResDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
+import com.whatslovermbti.mbti_prj.service.place.PlaceCandidateService;
 import com.whatslovermbti.mbti_prj.util.RandomPicker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,20 @@ public class PlaceRecommendationService {
     private static final int RANDOM_COUNT = 5;
 
     private final KeywordRecommendationService keywordRecommendationService;
+    private final PlaceCandidateService placeCandidateService;
 
-    public List<KakaoMapResponse.Document> recommend(
+    /**
+     * ⭐ 핵심 추천 엔진
+     */
+    public List<KakaoMapResponse.Document> recommendFromCandidates(
             User user,
             List<KakaoMapResponse.Document> candidates,
             int limit
     ) {
+        if (candidates == null || candidates.isEmpty()) {
+            return List.of();
+        }
+
         List<KakaoMapResponse.Document> sorted =
                 candidates.stream()
                         .sorted(Comparator.comparingDouble(
@@ -45,10 +55,7 @@ public class PlaceRecommendationService {
             User user,
             KakaoMapResponse.Document doc
     ) {
-        // ⚠️ 아직 Place/Keyword 매핑 전이므로
-        // 지금은 "기본 점수"만 두거나
-        // categoryName, placeName 기반 임시 점수 가능
-
-        return 1.0; // ← 지금 단계에선 이게 정상
+        // TODO: MBTI / Keyword / User Action 반영
+        return 1.0;
     }
 }

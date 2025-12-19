@@ -1,11 +1,9 @@
 package com.whatslovermbti.mbti_prj.controller;
 
-import com.whatslovermbti.mbti_prj.annotation.LoginUser;
 import com.whatslovermbti.mbti_prj.dto.user.UserResDto;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

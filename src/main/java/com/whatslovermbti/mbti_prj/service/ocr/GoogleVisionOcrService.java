@@ -73,6 +73,7 @@ public class GoogleVisionOcrService {
                     // 여러 줄 포함된 전체 문자열 (개행 포함)
                 }
             }
+            log.info("구글 VISION API 호출 !!");
 
             return sb.toString();
 

@@ -5,7 +5,10 @@ import com.whatslovermbti.mbti_prj.constant.ActionWeightPolicy;
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
 import com.whatslovermbti.mbti_prj.entity.*;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import com.whatslovermbti.mbti_prj.repository.*;
+import com.whatslovermbti.mbti_prj.service.place.PlaceKeywordMapper;
+import com.whatslovermbti.mbti_prj.service.place.PlacePersistenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,8 @@ public class UserActionService {
     private final PlaceRepository placeRepository;
     private final PlaceBookmarkRepository placeBookmarkRepository;
     private final PlaceViewHistoryRepository placeViewHistoryRepository;
+    private final PlacePersistenceService placePersistenceService;
+    private final PlaceKeywordMapper placeKeywordMapper;
 
     public void bookmarkPlace(Long userId, Long placeId) {
         User user = userRepository.findById(userId)
@@ -135,6 +140,15 @@ public class UserActionService {
 
             userKeywordPreferenceRepository.save(pref);
         }
+    }
+
+    public void onPlaceClicked(User user, KakaoMapResponse.Document d) {
+
+        Place place = placePersistenceService.getOrCreate(d);
+
+        placeKeywordMapper.mapKeywords(place, d);
+
+        applyUserAction(user.getId(), place.getId(), ActionType.VIEW);
     }
 }
 

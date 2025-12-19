@@ -30,15 +30,10 @@ public class KeywordRecommendationService {
     /**
      * 유저 + 키워드 → 최종 추천 점수
      */
-    public double calculateKeywordScore(User user, Keyword keyword) {
-
-        String targetMbti =
-                user.getPartnerMbti() != null
-                        ? user.getPartnerMbti()
-                        : user.getMbti();
+    public double calculateKeywordScore(User user, String mbti, Keyword keyword) {
 
         Map<Long, Integer> mbtiWeightMap =
-                aggregator.getMbtiWeightMap(targetMbti);
+                aggregator.getMbtiWeightMap(mbti);
 
         Map<Long, Integer> userPrefMap =
                 aggregator.getUserPreferenceMap(user);
@@ -67,7 +62,7 @@ public class KeywordRecommendationService {
         if (mbtiWeight != 0 || userPreference != 0) {
             log.info(
                     "[KEYWORD_SCORE] mbti={}, keyword={}, mbtiWeight={}, userPref={}, aiBoost={}, final={}",
-                    targetMbti,
+                    mbti,
                     keyword.getName(),
                     mbtiWeight,
                     userPreference,

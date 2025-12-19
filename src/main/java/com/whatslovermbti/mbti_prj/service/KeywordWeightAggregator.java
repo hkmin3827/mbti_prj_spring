@@ -98,10 +98,10 @@ public class KeywordWeightAggregator {
      * - MBTI 기본 가중치 + 유저 선호 점수 기준
      * - 정책/희석 적용 ❌
      */
-    public List<String> getTopKeywordNames(User user, int limit) {
+    public List<String> getTopKeywordNames(User user, String mbti, int limit) {
 
         Map<Long, Integer> mbtiWeightMap =
-                getMbtiWeightMap(user.getMbti());
+                getMbtiWeightMap(mbti);
 
         Map<Long, Integer> userPrefMap =
                 getUserPreferenceMap(user);

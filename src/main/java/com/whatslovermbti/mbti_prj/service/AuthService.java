@@ -5,6 +5,7 @@ import com.whatslovermbti.mbti_prj.constant.Provider;
 import com.whatslovermbti.mbti_prj.constant.Role;
 import com.whatslovermbti.mbti_prj.dto.auth.LoginReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.SignUpReqDto;
+import com.whatslovermbti.mbti_prj.dto.auth.WithdrawReqDto;
 import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -73,12 +74,26 @@ public class UserService {
     }
 
     @Transactional
-    public void withdraw(User user) {
+    public void withdraw(User user, WithdrawReqDto dto) {
+
         if (!userRepository.existsById(user.getId())) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
+        // LOCAL 계정 → 비밀번호 검증
+        if (user.getProvider() == Provider.LOCAL) {
+            if (dto == null || dto.getPassword() == null) {
+                throw new CustomException(ErrorCode.PASSWORD_REQUIRED);
+            }
+
+            if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+                throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
+            }
+        }
+
+        // 삭제
         userRepository.delete(user);
+        // → DB에서 ON DELETE CASCADE로 연관 엔티티 자동 삭제
     }
 }
 

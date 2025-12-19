@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice // (전역 예외 처리)
 public class GlobalExceptionHandler {
@@ -35,5 +36,12 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(code);
 
         return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxSize(MaxUploadSizeExceededException e) {
+        return ResponseEntity
+                .badRequest()
+                .body("파일 용량이 너무 큽니다. (최대 10MB)");
     }
 }
