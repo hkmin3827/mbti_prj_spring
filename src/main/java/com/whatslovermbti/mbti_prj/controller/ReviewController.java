@@ -3,9 +3,9 @@ package com.whatslovermbti.mbti_prj.controller;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
-import com.whatslovermbti.mbti_prj.service.CurrentUserService;
 import com.whatslovermbti.mbti_prj.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final CurrentUserService currentUserService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> createReview(
@@ -32,7 +31,7 @@ public class ReviewController {
             // OCR용 영수증만 서버로
             @RequestPart(required = false) MultipartFile receiptImage
     ) {
-        User user = currentUserService.getCurrentUser(userDetails);
+        User user = userDetails.getUser();
         Review review = reviewService.createReview(
                 user,
                 placeId,
@@ -43,5 +42,27 @@ public class ReviewController {
         );
 
         return ResponseEntity.ok(review.getId());
+    }
+
+    @GetMapping
+    public Page<Review> reviewBoard(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return reviewService.getReviewBoard(page, size);
+    }
+
+    @GetMapping("/me")
+    public Page<Review> myReviews(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        User user = userDetails.getUser();
+        return reviewService.getMyReviews(
+                user,
+                page,
+                size
+        );
     }
 }

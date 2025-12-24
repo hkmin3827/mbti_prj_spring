@@ -1,16 +1,22 @@
 package com.whatslovermbti.mbti_prj.security.oauth.userInfo;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
-
 import java.util.Map;
 
 public class NaverOAuthUserInfo implements OAuthUserInfo{
     private final Map<String, Object> attributes;
 
     public NaverOAuthUserInfo(Map<String, Object> attributes) {
-        this.attributes = (Map<String, Object>) attributes.get("response");
-    }
+        Object response = attributes.get("response");
 
+        if (!(response instanceof Map)) {
+            throw new IllegalArgumentException("Invalid Naver OAuth response");
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> castedResponse = (Map<String, Object>) response;
+        this.attributes = castedResponse;
+    }
     @Override
     public Provider getProvider() {
         return Provider.NAVER;
@@ -18,7 +24,7 @@ public class NaverOAuthUserInfo implements OAuthUserInfo{
 
     @Override
     public String getProviderId() {
-        return attributes.get("id").toString(); // ✅ 네이버 고유 ID
+        return attributes.get("id").toString(); // 네이버 고유 ID
     }
 
     @Override

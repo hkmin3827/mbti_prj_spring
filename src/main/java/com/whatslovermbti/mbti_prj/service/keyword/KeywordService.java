@@ -1,5 +1,4 @@
-package com.whatslovermbti.mbti_prj.service;
-
+package com.whatslovermbti.mbti_prj.service.keyword;
 
 import com.whatslovermbti.mbti_prj.entity.Keyword;
 import com.whatslovermbti.mbti_prj.repository.KeywordRepository;

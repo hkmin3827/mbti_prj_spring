@@ -8,6 +8,19 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
+    // 카카오 로그인
+    @Bean
+    public WebClient kakaoAuthWebClient(
+            WebClient.Builder builder,
+            @Value("${kakao.admin-key}") String adminKey
+    ) {
+        return builder
+                .baseUrl("https://kapi.kakao.com")
+                .defaultHeader("Authorization", "KakaoAK " + adminKey)
+                .build();
+    }
+
+    // 카카오지도 API
     @Bean
     public WebClient kakaoWebClient(
             WebClient.Builder builder,

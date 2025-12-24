@@ -22,9 +22,9 @@ public class PlaceKeyword {
     private int weight; // 1~5 또는 1~10
 
 
-    public PlaceKeyword(Place place, Keyword keyword) {
+    public PlaceKeyword(Place place, Keyword keyword, int weight) {
         this.place = place;
         this.keyword = keyword;
-        this.weight = 1; // 기본 신뢰도
+        this.weight = weight; // 기본 신뢰도
     }
 }

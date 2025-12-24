@@ -1,7 +1,8 @@
-package com.whatslovermbti.mbti_prj.service;
+package com.whatslovermbti.mbti_prj.service.action;
 
 import com.whatslovermbti.mbti_prj.constant.ActionType;
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.PlaceReaction;
 import com.whatslovermbti.mbti_prj.entity.User;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Service
@@ -24,13 +24,11 @@ public class PlaceReactionService {
     private final PlaceRepository placeRepository;
     private final PlaceReactionRepository placeReactionRepository;
     private final UserActionService userActionService;
-    private static final Duration CLICK_COOLDOWN = Duration.ofSeconds(2);
 
-    public void react(Long userId, Long placeId, ActionType type) {
+    public void react(Long userId, Long placeId, ActionType type, MbtiContext context) {
         if (type != ActionType.LIKE && type != ActionType.DISLIKE) {
             throw new IllegalArgumentException("Invalid reaction type: " + type);
         }
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -38,7 +36,7 @@ public class PlaceReactionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
 
         placeReactionRepository
-                .findByUserAndPlace(user, place)
+                .findByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)
                 .ifPresentOrElse(existing -> {
                     if (existing.getType() == type &&
                             existing.getUpdatedAt() != null &&
@@ -51,29 +49,63 @@ public class PlaceReactionService {
 
                     if (oldType == type) {
                         // 같은 반응 → 취소
-                        placeReactionRepository.delete(existing);
+                        placeReactionRepository.deleteByUserIdAndPlaceIdAndTargetMbtiAndType(
+                                userId, placeId, context, type
+                        );
 
-                        userActionService.applyUserAction(userId, placeId,
-                                invert(type)); // -delta
+                        userActionService.applyUserAction(user, place,
+                                invert(type), context); // -delta
                     } else {
                         // 반응 전환
                         existing.setType(type);
 
-                        userActionService.applyUserAction(userId, placeId,
-                                invert(oldType)); // 기존 반응 제거
-                        userActionService.applyUserAction(userId, placeId,
-                                type);            // 새 반응 적용
+                        userActionService.applyUserAction(user, place,
+                                invert(oldType), context); // 기존 반응 제거
+                        userActionService.applyUserAction(user, place,
+                                type, context);            // 새 반응 적용
                     }
                 }, () -> {
                     // 최초 반응
                     placeReactionRepository.save(
-                            new PlaceReaction(user, place, type)
+                            new PlaceReaction(user, place, type, context)
                     );
 
-                    userActionService.applyUserAction(userId, placeId, type);
+                    userActionService.applyUserAction(user, place, type, context);
                 });
     }
 
+    // 마이페이지에서 좋아요 취소
+    public void removeLike(
+            Long userId,
+            Long placeId,
+            MbtiContext context
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+        PlaceReaction reaction =
+                placeReactionRepository
+                        .findByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)
+                        .orElseThrow(() -> new CustomException(ErrorCode.REACTION_NOT_FOUND));
+
+        if (reaction.getType() != ActionType.LIKE) {
+            return; // 이미 LIKE 아님 → 무시
+        }
+
+        // reacton 삭제
+        placeReactionRepository.delete(reaction);
+
+        // LIKE 가중치 되돌림
+        userActionService.applyUserAction(
+                user,
+                place,
+                ActionType.DISLIKE,
+                context
+        );
+    }
 
 
     private ActionType invert(ActionType type) {

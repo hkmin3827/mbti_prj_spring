@@ -1,4 +1,4 @@
-package com.whatslovermbti.mbti_prj.resolver;
+package com.whatslovermbti.mbti_prj.resolver.argument;
 
 import com.whatslovermbti.mbti_prj.annotation.LoginUser;
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;

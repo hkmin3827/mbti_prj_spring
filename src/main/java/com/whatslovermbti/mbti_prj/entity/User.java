@@ -2,6 +2,7 @@ package com.whatslovermbti.mbti_prj.entity;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
 import com.whatslovermbti.mbti_prj.constant.Role;
+import com.whatslovermbti.mbti_prj.dto.user.ProfileReqDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +23,10 @@ public class User {
 
     @Column(unique = true)
     private String email;   // 소셜 계정 이메일 포함, 카카오같이 이메일 없을 수 있으므로 nullable = true
+
+    @Column(length = 30)
     private String name;
+
     private String profileImage;
     private String password;   // 소셜 로그인 계정은 null
 
@@ -33,13 +37,6 @@ public class User {
     private String mbti;
     private String partnerMbti;   // 상대 MBTI (옵션)
 
-    // 이런식으로 선택할것임 **
-//    MBTI baseMbti =
-//            request.isPartnerMode()
-//                    ? user.getPartnerMbti()
-//                    : user.getMbti();
-
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;     // USER / ADMIN
@@ -47,6 +44,9 @@ public class User {
 
     @Column(length = 30)
     private String telnum;
+
+    @Column(nullable = false)
+    private boolean isActive = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -56,4 +56,20 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+
+    public void updateProfile(String name, String profileImage, String mbti, String partnerMbti, String telnum) {
+        this.name =name;
+        this.profileImage = profileImage;
+        this.mbti = mbti;
+        this.partnerMbti = partnerMbti;
+        this.telnum = telnum;
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
 }

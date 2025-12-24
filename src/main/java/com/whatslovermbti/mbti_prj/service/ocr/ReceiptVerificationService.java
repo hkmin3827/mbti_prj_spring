@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.service.ocr;
 
-
 import com.whatslovermbti.mbti_prj.receipt.model.ReceiptInfo;
 import com.whatslovermbti.mbti_prj.receipt.model.ScoreVO;
 import com.whatslovermbti.mbti_prj.receipt.parser.ReceiptParser;

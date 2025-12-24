@@ -4,6 +4,7 @@ package com.whatslovermbti.mbti_prj.infra.kakao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.whatslovermbti.mbti_prj.infra.kakao.dto.KakaoKeywordResponse;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 public class KakaoMapResponse {
 
-    private List<Document> documents;
+    private List<Document> documents = new ArrayList<>();
     private Meta meta;
 
     /* ==============================
@@ -25,6 +26,7 @@ public class KakaoMapResponse {
         response.documents = keywordResponse.getDocuments().stream()
                 .map(doc -> {
                     Document d = new Document();
+                    d.id = doc.getId();
                     d.placeName = doc.getPlace_name();
                     d.categoryName = doc.getCategory_name();
                     d.addressName = doc.getAddress_name();
@@ -43,27 +45,18 @@ public class KakaoMapResponse {
         return response;
     }
 
-    /* ==============================
-       카테고리 필터
-       ============================== */
-    public void filterByCategory(String categoryKeyword) {
-        if (categoryKeyword == null || categoryKeyword.isBlank()) return;
-
-        this.documents = this.documents.stream()
-                .filter(doc ->
-                        doc.getCategoryName() != null &&
-                                doc.getCategoryName().contains(categoryKeyword)
-                )
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
     public void applyDocuments(List<Document> newDocs) {
+        if (newDocs == null) {
+            this.documents = new ArrayList<>();
+            return;
+        }
         this.documents = new ArrayList<>(newDocs);
     }
 
-    @Getter
+    @Getter @Setter
     public static class Document {
 
+        @JsonProperty("id")
         private String id;
 
         @JsonProperty("place_name")

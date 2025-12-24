@@ -8,7 +8,6 @@ import com.whatslovermbti.mbti_prj.dto.place.PlaceResDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component
@@ -23,16 +22,18 @@ public class PlaceMapper {
             List<String> keywords,
             double distance
     ) {
-        return new PlaceResDto(
-                null,
+        String address =
+                doc.getRoadAddressName() != null
+                        ? doc.getRoadAddressName()
+                        : doc.getAddressName();
+
+        return PlaceResDto.fromKakao(
                 doc.getPlaceName(),
                 category,
-                doc.getRoadAddressName() != null ? doc.getRoadAddressName() : doc.getAddressName(),
+                address,
                 safeParseDouble(doc.getLatitude()),
                 safeParseDouble(doc.getLongitude()),
-                null,        // 카카오는 rating 기본 제공 안 함
-                List.of(),    // 카카오는 imageUrls 기본 제공 안 함
-                doc.getId(),
+                doc.getId(),      // kakaoPlaceId
                 keywords,
                 distance
         );
@@ -40,22 +41,17 @@ public class PlaceMapper {
 
     public PlaceResDto fromEntity(
             Place place,
-            double distance
+            Double distance
     ) {
         List<String> keywords = place.getPlaceKeywords().stream()
                 .map(pk -> pk.getKeyword().getName())
                 .toList();
 
-        return new PlaceResDto(
-                place.getId(),
-                place.getName(),
-                place.getCategory(),
-                place.getAddress(),
-                place.getLatitude(),
-                place.getLongitude(),
-                place.getRating(),
-                parseImages(place.getImages()), // ✅ 누락됐던 parseImages 제공
-                place.getMapPlaceId(),
+        List<String> imageUrls = parseImages(place.getImages());
+
+        return PlaceResDto.fromEntity(
+                place,
+                imageUrls,
                 keywords,
                 distance
         );

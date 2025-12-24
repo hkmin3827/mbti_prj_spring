@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.entity;
 
 import com.whatslovermbti.mbti_prj.constant.ActionType;
+import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"user_id", "place_id"}
+                columnNames = {"user_id", "place_id", "target_mbti"}
         )
 )
 @Getter @Setter
@@ -36,11 +37,13 @@ public class PlaceReaction {
 
     private LocalDateTime updatedAt;
 
-    public PlaceReaction(User user, Place place, ActionType type) {
+    public PlaceReaction(User user, Place place, ActionType type, MbtiContext targetMbti) {
         this.user = user;
         this.place = place;
         this.type = type;
     }
+    @Enumerated(EnumType.STRING)
+    MbtiContext targetMbti;
 
     @PrePersist
     void onCreate() {

@@ -13,6 +13,9 @@ import com.whatslovermbti.mbti_prj.service.ocr.ReceiptVerificationService;
 import com.whatslovermbti.mbti_prj.service.s3.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,5 +86,20 @@ public class ReviewService {
         review.setReceiptImageUrl(receiptUrl);
 
         return reviewRepository.save(review);
+    }
+
+
+    // 후기게시판 : 전체 리뷰 조회(최신순)
+    public Page<Review> getReviewBoard(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
+
+    /**
+     * ✅ 내 리뷰 조회 (삭제된 place 제외 버전 기본)
+     */
+    public Page<Review> getMyReviews(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return reviewRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable);
     }
 }

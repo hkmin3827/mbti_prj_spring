@@ -12,6 +12,7 @@ public class KakaoKeywordResponse {
 
     @Getter
     public static class Document {
+        private String id;
         private String place_name;
         private String category_name;
         private String address_name;

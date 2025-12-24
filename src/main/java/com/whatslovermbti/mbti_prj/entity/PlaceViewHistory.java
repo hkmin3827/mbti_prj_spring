@@ -1,11 +1,21 @@
 package com.whatslovermbti.mbti_prj.entity;
 // 클릭한 플레이스 (CLICK)
 
+import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"user_id", "place_id", "target_mbti"}
+        )
+)
 @Entity
+@Getter
+@NoArgsConstructor
 public class PlaceViewHistory {
 
     @Id
@@ -26,8 +36,12 @@ public class PlaceViewHistory {
         this.viewedAt = LocalDateTime.now();
     }
 
-    public PlaceViewHistory(User user, Place place) {
+    public PlaceViewHistory(User user, Place place, MbtiContext targetMbti) {
         this.user = user;
         this.place = place;
+        this.targetMbti = targetMbti;
     }
+
+    @Enumerated(EnumType.STRING)
+    MbtiContext targetMbti;
 }

@@ -1,16 +1,16 @@
 package com.whatslovermbti.mbti_prj.service.place;
 
+import com.whatslovermbti.mbti_prj.constant.PlaceSubCategory;
 import com.whatslovermbti.mbti_prj.entity.Keyword;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.PlaceKeyword;
-import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import com.whatslovermbti.mbti_prj.repository.KeywordRepository;
 import com.whatslovermbti.mbti_prj.repository.PlaceKeywordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,88 +19,109 @@ public class PlaceKeywordMapper {
     private final KeywordRepository keywordRepository;
     private final PlaceKeywordRepository placeKeywordRepository;
 
-    public void mapKeywords(Place place, KakaoMapResponse.Document d) {
+    /**
+     * Place 최초 저장 / 행동 발생 시점에만 호출
+     */
+    @Transactional
+    public void mapKeywords(
+            Place place,
+            Set<PlaceSubCategory> subCategories,
+            List<String> inferredKeywords
+    ) {
 
-        String placeName = d.getPlaceName();
-        String category = d.getCategoryName(); // ex) "카페 > 디저트 > 커피"
+        Map<String, Integer> keywordWeights = new HashMap<>();
 
-        List<String> keywordNames = new ArrayList<>();
+        /* ================= 공통 ================= */
+        add(keywordWeights, "데이트", 1);
 
-        /* =========================
-           ☕ 카페 계열
-           ========================= */
-        if (category.contains("카페")) {
+        /* ================= SubCategory 기반 보정 ================= */
 
-            // 카페 + 스터디 / 북카페
-            if (containsAny(placeName, "스터디", "북카페", "라이브러리")) {
-                keywordNames.add("조용한");
-                keywordNames.add("논리적인");
-            }
+        if (hasAny(subCategories,
+                PlaceSubCategory.RESTAURANT,
+                PlaceSubCategory.FINE_DINING)) {
 
-            // 카페 + 루프탑 / 테라스 / 전망
-            if (containsAny(placeName, "루프탑", "테라스", "전망")) {
-                keywordNames.add("로맨틱한");
-            }
+            add(keywordWeights, "계획적인", 2);
+            add(keywordWeights, "분위기좋은", 2);
+        }
 
-            // 카페 + 라운지 / 갤러리
-            if (containsAny(placeName, "라운지", "갤러리")) {
-                keywordNames.add("감성적인");
-            }
+        if (hasAny(subCategories,
+                PlaceSubCategory.BAR,
+                PlaceSubCategory.IZAKAYA,
+                PlaceSubCategory.PUB,
+                PlaceSubCategory.POCHA)) {
 
-            // 카페 + 파티 / 클럽
-            if (containsAny(placeName, "파티", "클럽")) {
-                keywordNames.add("시끌벅적한");
-                keywordNames.add("활동적인");
+            add(keywordWeights, "즉흥적인", 2);
+            add(keywordWeights, "친밀한", 2);
+        }
+
+        if (subCategories.contains(PlaceSubCategory.QUICK_MEAL)) {
+            add(keywordWeights, "가성비", 2);
+        }
+
+        if (subCategories.contains(PlaceSubCategory.STUDY_CAFE)) {
+            add(keywordWeights, "논리적인", 2);
+            add(keywordWeights, "조용한", 2);
+        }
+
+        if (hasAny(subCategories,
+                PlaceSubCategory.PARK,
+                PlaceSubCategory.WALK,
+                PlaceSubCategory.VIEW)) {
+
+            add(keywordWeights, "자유로운", 2);
+        }
+
+        if (hasAny(subCategories,
+                PlaceSubCategory.ACTIVITY,
+                PlaceSubCategory.GAME,
+                PlaceSubCategory.SPORTS)) {
+
+            add(keywordWeights, "활동적인", 2);
+        }
+
+        /* ================= Inferer 결과 병합 ================= */
+
+        if (inferredKeywords != null) {
+            for (String k : inferredKeywords) {
+                add(keywordWeights, k, 1);
             }
         }
 
-        /* =========================
-           🍽️ 음식점 계열
-           ========================= */
-        if (category.contains("음식점") || category.contains("레스토랑")) {
+        if (keywordWeights.isEmpty()) return;
 
-            if (containsAny(placeName, "와인", "비스트로", "파인다이닝", "오마카세")) {
-                keywordNames.add("로맨틱한");
-                keywordNames.add("계획적인");
-            }
+        /* ================= DB 처리 (벌크) ================= */
 
-            if (containsAny(placeName, "뷔페", "무한")) {
-                keywordNames.add("활동적인");
-            }
+        List<String> names = new ArrayList<>(keywordWeights.keySet());
+
+        List<Keyword> keywords = keywordRepository.findByNameIn(names);
+
+        Map<String, Keyword> keywordMap =
+                keywords.stream()
+                        .collect(Collectors.toMap(Keyword::getName, k -> k));
+
+        List<PlaceKeyword> placeKeywords = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> e : keywordWeights.entrySet()) {
+            Keyword keyword = keywordMap.get(e.getKey());
+            if (keyword == null) continue;
+
+            placeKeywords.add(
+                    new PlaceKeyword(place, keyword, e.getValue())
+            );
         }
 
-        /* =========================
-           🎡 관광명소 / 데이트
-           ========================= */
-        if (category.contains("관광") || category.contains("전시") || category.contains("미술관")) {
-
-            if (containsAny(placeName, "전시", "미술", "갤러리")) {
-                keywordNames.add("감성적인");
-                keywordNames.add("논리적인");
-            }
-
-            if (containsAny(placeName, "공원", "산책", "전망")) {
-                keywordNames.add("자유로운");
-                keywordNames.add("즉흥적인");
-            }
-        }
-
-        /* =========================
-           저장 (내부 표준 키워드만)
-           ========================= */
-        for (String name : keywordNames) {
-            keywordRepository.findByName(name).ifPresent(keyword -> {
-                if (!placeKeywordRepository.existsByPlaceAndKeyword(place, keyword)) {
-                    placeKeywordRepository.save(new PlaceKeyword(place, keyword));
-                }
-            });
-        }
+        placeKeywordRepository.saveAll(placeKeywords);
     }
 
-    private boolean containsAny(String target, String... keywords) {
-        if (target == null) return false;
-        for (String k : keywords) {
-            if (target.contains(k)) return true;
+    /* ================= util ================= */
+
+    private void add(Map<String, Integer> map, String keyword, int weight) {
+        map.merge(keyword, weight, Math::max);
+    }
+
+    private boolean hasAny(Set<PlaceSubCategory> set, PlaceSubCategory... targets) {
+        for (PlaceSubCategory t : targets) {
+            if (set.contains(t)) return true;
         }
         return false;
     }

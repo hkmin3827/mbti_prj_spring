@@ -12,7 +12,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ public class MbtiKeywordWeightSeeder implements CommandLineRunner {
     private final MbtiKeywordWeightRepository weightRepository;
     private final SeedHistoryRepository seedHistoryRepository;
 
+    // 해당 mbti 축이 해당 키워드를 얼마나 선호하는가
     @Override
     public void run(String... args) {
         if (seedHistoryRepository.existsById("MBTI_KEYWORD_WEIGHT")) {

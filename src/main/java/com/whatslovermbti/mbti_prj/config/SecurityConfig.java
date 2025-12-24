@@ -37,8 +37,10 @@ public class SecurityConfig {
 //                                "/",
 //                                "/login",
                                 "/oauth2/**",
-                                "/login/oauth2/**"
+                                "/login/oauth2/**",
+                                "/test/places/**"
                         ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(
                                 "/api/places/**",
                                 "/api/users/**",
@@ -49,7 +51,8 @@ public class SecurityConfig {
                                 "/api/keywords/**",
                                 "/api/test/ocr/**",
                                 "/api/s3/**",
-                                "/api/reviews/**"
+                                "/api/reviews/**",
+                                "/api/profile/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )

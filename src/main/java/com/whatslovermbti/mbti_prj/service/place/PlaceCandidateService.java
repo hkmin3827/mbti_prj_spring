@@ -1,77 +1,144 @@
 package com.whatslovermbti.mbti_prj.service.place;
 
-import com.whatslovermbti.mbti_prj.constant.MbtiContext;
-import com.whatslovermbti.mbti_prj.entity.User;
+import com.whatslovermbti.mbti_prj.constant.Category;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoCategoryMapper;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoCourseCategory;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapClient;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
-import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse.Document;
-import com.whatslovermbti.mbti_prj.service.KeywordWeightAggregator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PlaceCandidateService {
-    private static final int KEYWORD_LIMIT = 5;   // 상위 키워드 수
-    private static final int PAGE_SIZE = 15;      // 키워드당 조회 수
 
     private final KakaoMapClient kakaoMapClient;
-    private final KeywordWeightAggregator keywordWeightAggregator;
 
+    private static final int TARGET_SIZE = 45;
+
+
+    /**
+     * 후보군 확보 + Place resolve (유일한 진입점)
+     * - Kakao API 호출
+     * - 중복 제거
+     * - Place 영속화
+     */
     @Cacheable(
             value = "kakaoCandidateCache",
-            key = "'candidate:' + #user.id + ':' + #mbti + ':' + #lat + ':' + #lng + ':' + #radius + ':' + #categoryCode"
+            key = "'candidate:' + #lat + ':' + #lng + ':' + #radius + ':' + #category",
+            unless = "#result == null || #result.isEmpty()"
     )
-    public List<KakaoMapResponse.Document> searchCandidates(
-            User user,
-            String mbti,
+    @Transactional
+    public List<KakaoMapResponse.Document> fetchCandidates(
+            double lat,
+            double lng,
+            int radius,
+            Category category
+    ) {
+        log.info("Kakao API CALL (CANDIDATE - CATEGORY PAGINATION)");
+
+        // COURSE는 다중 호출
+        if (category == Category.COURSE) {
+            return searchCourseCandidates(lat, lng, radius);
+        }
+
+        String categoryCode = KakaoCategoryMapper.toKakaoCode(category);
+        return searchSingleCategory(lat, lng, radius, categoryCode);
+    }
+
+    // 카페, 음식점
+    private List<KakaoMapResponse.Document> searchSingleCategory(
             double lat,
             double lng,
             int radius,
             String categoryCode
     ) {
-        log.info("Kakao API CALL (CANDIDATE - CATEGORY + OPTIONAL KEYWORD)");
-
         Map<String, KakaoMapResponse.Document> merged = new LinkedHashMap<>();
 
-        /* ============================
-           1️⃣ category 기반 1차 후보군
-           ============================ */
-        KakaoMapResponse categoryResp =
-                kakaoMapClient.searchByCategory(lat, lng, radius, categoryCode);
+        int page = 1;
+        boolean isEnd = false;
+        int MAX_PAGE = 5;
 
-        for (KakaoMapResponse.Document d : categoryResp.getDocuments()) {
-            merged.putIfAbsent(d.getPlaceName(), d);
-        }
+        while (!isEnd && page <= MAX_PAGE) {
 
-        /* ============================
-           2️⃣ (선택) 키워드 기반 확장
-           ============================ */
-        List<String> keywords =
-                keywordWeightAggregator.getTopKeywordNames(user, mbti, KEYWORD_LIMIT);
-
-        for (String keyword : keywords) {
-            KakaoMapResponse keywordResp =
-                    kakaoMapClient.searchByKeywordWithLocation(
-                            keyword, lat, lng, radius, 1, PAGE_SIZE
+            KakaoMapResponse resp =
+                    kakaoMapClient.searchByCategory(
+                            lat, lng, radius, page, categoryCode
                     );
 
-            for (KakaoMapResponse.Document d : keywordResp.getDocuments()) {
-                merged.putIfAbsent(d.getPlaceName(), d);
+            if (resp == null || resp.getDocuments() == null) {
+                break;
+            }
+
+            for (KakaoMapResponse.Document d : resp.getDocuments()) {
+                merged.putIfAbsent(d.getId(), d);
+            }
+
+            isEnd = resp.getMeta() != null && resp.getMeta().isEnd();
+            page++;
+        }
+
+        return new ArrayList<>(merged.values());
+    }
+
+
+    // 데이트 코스
+    private List<KakaoMapResponse.Document> searchCourseCandidates(
+            double lat,
+            double lng,
+            int radius
+    ) {
+        Map<String, KakaoMapResponse.Document> merged = new LinkedHashMap<>();
+
+        for (String code : KakaoCourseCategory.codes()) {
+
+            int page = 1;
+            boolean isEnd = false;
+            int MAX_PAGE = 3; // COURSE는 적당히
+
+            while (!isEnd && page <= MAX_PAGE) {
+
+                KakaoMapResponse resp =
+                        kakaoMapClient.searchByCategory(
+                                lat, lng, radius, page, code
+                        );
+
+                if (resp == null || resp.getDocuments() == null) {
+                    break;
+                }
+
+                for (KakaoMapResponse.Document d : resp.getDocuments()) {
+                    if (isExcludedCourseFacility(d)) {
+                        continue; // 숙박, 주차장 등 제거
+                    }
+
+                    merged.putIfAbsent(d.getId(), d);
+                    if (merged.size() >= TARGET_SIZE) {
+                        return new ArrayList<>(merged.values());
+                    }
+                }
+
+                isEnd = resp.getMeta() != null && resp.getMeta().isEnd();
+                page++;
             }
         }
 
-        /* ============================
-           3️⃣ 공통 응답 생성
-           ============================ */
         return new ArrayList<>(merged.values());
+    }
+
+    private boolean isExcludedCourseFacility(KakaoMapResponse.Document d) {
+        String category = d.getCategoryName();
+        if (category == null) return false;
+
+        return category.contains("주차장")
+                || category.contains("화장실")
+                || category.contains("매표")
+                || category.contains("안내")
+                || category.contains("숙박");
     }
 }

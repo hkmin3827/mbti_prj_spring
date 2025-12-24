@@ -33,10 +33,10 @@ public class Review {
     @Column(nullable = true)
     private String receiptImageUrl;
 
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
     @PrePersist
     public void onCreate() {
-    this.createAt = LocalDateTime.now();
+    this.createdAt = LocalDateTime.now();
     }
 
 }

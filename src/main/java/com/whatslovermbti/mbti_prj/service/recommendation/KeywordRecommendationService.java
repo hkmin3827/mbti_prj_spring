@@ -2,10 +2,8 @@ package com.whatslovermbti.mbti_prj.service.recommendation;
 
 import com.whatslovermbti.mbti_prj.entity.Keyword;
 import com.whatslovermbti.mbti_prj.entity.User;
-import com.whatslovermbti.mbti_prj.entity.UserKeywordPreference;
-import com.whatslovermbti.mbti_prj.repository.UserKeywordPreferenceRepository;
-import com.whatslovermbti.mbti_prj.service.KeywordWeightAggregator;
-import com.whatslovermbti.mbti_prj.service.weight.MbtiKeywordWeightPolicy;
+import com.whatslovermbti.mbti_prj.service.keyword.KeywordWeightAggregator;
+import com.whatslovermbti.mbti_prj.service.policy.BehaviorDilutionPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,7 @@ public class KeywordRecommendationService {
     private static final double MBTI_MIN_FLOOR = 1.5;
 
     private final KeywordWeightAggregator aggregator;
-    private final MbtiKeywordWeightPolicy policy;
+    private final BehaviorDilutionPolicy policy;
 
     /**
      * 유저 + 키워드 → 최종 추천 점수
@@ -33,10 +31,10 @@ public class KeywordRecommendationService {
     public double calculateKeywordScore(User user, String mbti, Keyword keyword) {
 
         Map<Long, Integer> mbtiWeightMap =
-                aggregator.getMbtiWeightMap(mbti);
+                aggregator.getMbtiKeywordWeightMapById(mbti);
 
         Map<Long, Integer> userPrefMap =
-                aggregator.getUserPreferenceMap(user);
+                aggregator.getUserKeywordPreferenceMapById(user);
 
         int mbtiWeight =
                 mbtiWeightMap.getOrDefault(keyword.getId(), 0);

@@ -1,0 +1,16 @@
+package com.whatslovermbti.mbti_prj.constant;
+
+
+public enum PlaceSubCategory {
+    // FD6
+    RESTAURANT, FINE_DINING, BAR, IZAKAYA, POCHA,
+    PUB, BUFFET, FAST_CASUAL, QUICK_MEAL,
+
+    // CE7
+    BAKERY, DESSERT, ROOFTOP, TERRACE,
+    STUDY_CAFE, WORK_CAFE, EMOTIONAL,
+
+    // COURSE
+    PARK, WALK, VIEW, EXHIBITION, MUSEUM,
+    ACTIVITY, GAME, SPORTS, CULTURE, PERFORMANCE, CINEMA
+}

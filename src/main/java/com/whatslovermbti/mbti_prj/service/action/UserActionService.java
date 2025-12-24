@@ -1,0 +1,179 @@
+package com.whatslovermbti.mbti_prj.service.action;
+
+import com.whatslovermbti.mbti_prj.constant.*;
+import com.whatslovermbti.mbti_prj.dto.place.PlaceSnapshot;
+import com.whatslovermbti.mbti_prj.entity.*;
+import com.whatslovermbti.mbti_prj.exception.CustomException;
+import com.whatslovermbti.mbti_prj.repository.*;
+import com.whatslovermbti.mbti_prj.service.place.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class UserActionService {
+    private final PlaceKeywordRepository placeKeywordRepository;
+    private final UserKeywordPreferenceRepository userKeywordPreferenceRepository;
+    private final UserRepository userRepository;
+    private final PlaceRepository placeRepository;
+    private final PlaceBookmarkRepository placeBookmarkRepository;
+    private final PlaceViewHistoryRepository placeViewHistoryRepository;
+    private final PlaceResolver placeResolver;
+    private final UserActionLogRepository userActionLogRepository;
+
+
+    // VIEW 행동 진입점
+    public void onPlaceClicked(User user, PlaceSnapshot snapshot, MbtiContext context) {
+        Place place = placeResolver.resolve(snapshot);
+
+        recordView(user.getId(), place.getId(), context);
+    }
+
+    public void bookmarkPlace(Long userId, Long placeId, MbtiContext context) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+
+        if (placeBookmarkRepository.existsByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)) {
+            return; // 이미 저장됨 → 무시 or 예외
+        }
+
+        placeBookmarkRepository.save(
+                new PlaceBookmark(user, place, context)
+        );
+
+        applyUserAction(user, place, ActionType.SAVE, context);
+    }
+
+    public void removeBookmark(Long userId, Long placeId, MbtiContext context) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+        PlaceBookmark bookmark =
+                placeBookmarkRepository.findByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)
+                        .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
+
+        // 북마크 삭제
+        placeBookmarkRepository
+                .deleteByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context);
+
+        // 가중치 되돌리기
+        applyUserAction(user, place, ActionType.UNSAVE, context);
+    }
+
+
+    public void recordView(Long userId, Long placeId, MbtiContext context) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+        boolean alreadyViewedToday =
+                placeViewHistoryRepository
+                        .existsByUserAndPlaceAndTargetMbtiAndViewedAtBetween(
+                                user, place, context, startOfDay, endOfDay
+                        );
+
+        // 해당 장소 그 전에 본기록 있으면 삭제
+        placeViewHistoryRepository.deleteByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context);
+
+        placeViewHistoryRepository.save(
+                new PlaceViewHistory(user, place, context)
+        );
+
+        // 최근 20개 유지
+        List<Long> ids =
+                placeViewHistoryRepository
+                        .findIdsByUserAndTargetMbtiOrderByViewedAtDesc(userId, context);
+        if (ids.size() > 20) {
+            placeViewHistoryRepository.deleteByIds(ids.subList(20, ids.size()));
+        }
+
+        if (!alreadyViewedToday) {
+            applyUserAction(user, place, ActionType.VIEW, context);
+        }
+    }
+
+    // viewHistory는 삭제해도 가중치 되돌리지 X, 내역을 지우고 싶은 목적이 장소가 마음에 안 들어서가 아니기 때문
+    public void removeViewHistory(Long userId, Long placeId) {
+        placeViewHistoryRepository.deleteByUserIdAndPlaceId(userId, placeId);
+    }
+
+    public void applyUserAction(User user, Place place, ActionType actionType, MbtiContext context) {
+
+        // 하루 1회 제한
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        boolean alreadyLogged =
+                userActionLogRepository
+                        .existsByUserAndPlaceAndActionTypeAndTargetMbtiAndCreatedAtBetween(
+                                user,
+                                place,
+                                actionType,
+                                context,
+                                startOfDay,
+                                endOfDay
+                        );
+
+        if (alreadyLogged) {
+            return; // 하루에 존재하면 로그 + 가중치 반영 전부 중단
+        }
+
+        userActionLogRepository.save(
+                UserActionLog.of(user, place, actionType, context)
+        );
+
+        int delta = ActionWeightPolicy.getWeight(actionType);
+
+        List<PlaceKeyword> placeKeywords =
+                placeKeywordRepository.findByPlace(place);
+
+        // 키워드가 없는 장소면 로그만 남기고 종료
+        if (placeKeywords.isEmpty()) {
+            return;
+        }
+
+        for (PlaceKeyword pk : placeKeywords) {
+
+            Keyword keyword = pk.getKeyword();
+
+            UserKeywordPreference pref =
+                    userKeywordPreferenceRepository
+                            .findByUserAndKeywordAndTargetMbti(user, keyword, context)
+                            .orElseGet(() -> {
+                                UserKeywordPreference newPref = new UserKeywordPreference();
+                                newPref.setUser(user);
+                                newPref.setKeyword(keyword);
+                                newPref.setScore(0);
+                                newPref.setTargetMbti(context);
+                                return newPref;
+                            });
+
+            // 안전하게 점수 누적
+            pref.setScore(
+                    Math.max(-100, Math.min(100, pref.getScore() + delta))
+            );
+
+            userKeywordPreferenceRepository.save(pref);
+        }
+    }
+}
+

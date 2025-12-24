@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.repository;
 
+import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.entity.Keyword;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.entity.UserKeywordPreference;
@@ -10,10 +11,6 @@ import java.util.Optional;
 
 public interface UserKeywordPreferenceRepository
         extends JpaRepository<UserKeywordPreference, Long> {
-
-    // 특정 유저 + 특정 키워드 선호도 조회
-    Optional<UserKeywordPreference> findByUserAndKeyword(User user, Keyword keyword);
-
     // 유저가 가진 모든 키워드 선호도
     List<UserKeywordPreference> findByUser(User user);
 
@@ -21,4 +18,10 @@ public interface UserKeywordPreferenceRepository
     List<UserKeywordPreference> findByKeyword(Keyword keyword);
 
     List<UserKeywordPreference> findAllByUser(User user);
+
+    Optional<UserKeywordPreference> findByUserAndKeywordAndTargetMbti(
+            User user,
+            Keyword keyword,
+            MbtiContext targetMbti
+    );
 }

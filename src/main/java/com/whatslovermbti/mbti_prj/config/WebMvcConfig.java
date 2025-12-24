@@ -1,6 +1,6 @@
 package com.whatslovermbti.mbti_prj.config;
 
-import com.whatslovermbti.mbti_prj.resolver.LoginUserArgumentResolver;
+import com.whatslovermbti.mbti_prj.resolver.argument.LoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

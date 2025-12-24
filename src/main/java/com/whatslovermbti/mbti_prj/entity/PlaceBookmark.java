@@ -1,8 +1,9 @@
 package com.whatslovermbti.mbti_prj.entity;
 // 저장된 플레이스 (SAVE)
 
+import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,9 +11,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"user_id", "place_id"}
+                columnNames = {"user_id", "place_id", "target_mbti"}
         )
 )
+@Getter
+@NoArgsConstructor
 public class PlaceBookmark {
 
     @Id
@@ -32,8 +35,11 @@ public class PlaceBookmark {
         this.createdAt = LocalDateTime.now();
     }
 
-    public PlaceBookmark(User user, Place place) {
+    public PlaceBookmark(User user, Place place, MbtiContext targetMbti) {
         this.user = user;
         this.place = place;
+        this.targetMbti = targetMbti;
     }
+    @Enumerated(EnumType.STRING)
+    MbtiContext targetMbti;
 }

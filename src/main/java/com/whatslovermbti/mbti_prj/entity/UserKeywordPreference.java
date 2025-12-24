@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.entity;
 
+import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Table(
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"user_id", "keyword_id"}
+                columnNames = {"user_id", "keyword_id", "target_mbti"}
         )
 )
 public class UserKeywordPreference {
@@ -23,6 +24,9 @@ public class UserKeywordPreference {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Keyword keyword;
+
+    @Enumerated(EnumType.STRING)
+    MbtiContext targetMbti;
 
     // 선호 점수 (-100 ~ +100 권장)
     private int score;

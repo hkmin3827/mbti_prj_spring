@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.entity;
 
+import com.whatslovermbti.mbti_prj.constant.MbtiAxis;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,10 @@ public class Keyword {
     // 내부 표준 키워드
     @Column(unique = true, nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MbtiAxis axis;
 
     @OneToMany(mappedBy = "keyword")
     private List<PlaceKeyword> placeKeywords = new ArrayList<>();

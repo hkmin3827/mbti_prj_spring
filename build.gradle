@@ -60,6 +60,10 @@ dependencies {
 
 	// WebClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// 캐시 TTL
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+	implementation 'org.springframework:spring-context-support'
 }
 tasks.named('test') {
 	useJUnitPlatform()

@@ -1,4 +1,4 @@
-package com.whatslovermbti.mbti_prj.resolver;
+package com.whatslovermbti.mbti_prj.resolver.context;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TargetMbtiResolver {
 
-    public String resolve(User user, MbtiContext targetMbti) {
+    public String resolve(User user, MbtiContext context) {
 
-        if (targetMbti == MbtiContext.SELF) {
+        if (context == MbtiContext.SELF) {
             return user.getMbti();
         }
 
-        if (targetMbti == MbtiContext.PARTNER) {
+        if (context == MbtiContext.PARTNER) {
             if (user.getPartnerMbti() == null) {
                 throw new CustomException(ErrorCode.PARTNER_MBTI_NOT_SET);
             }

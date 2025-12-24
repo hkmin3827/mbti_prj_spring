@@ -2,7 +2,7 @@ package com.whatslovermbti.mbti_prj.controller;
 
 
 import com.whatslovermbti.mbti_prj.entity.Keyword;
-import com.whatslovermbti.mbti_prj.service.KeywordService;
+import com.whatslovermbti.mbti_prj.service.keyword.KeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

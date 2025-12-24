@@ -8,7 +8,6 @@ import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import com.whatslovermbti.mbti_prj.security.jwt.JwtProvider;
 import com.whatslovermbti.mbti_prj.service.AuthService;
-import com.whatslovermbti.mbti_prj.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +24,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtProvider jwtProvider;
-    private final CurrentUserService currentUserService;
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpReqDto dto) {
@@ -49,7 +47,7 @@ public class AuthController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody(required = false) WithdrawReqDto dto
     ) {
-        User user = currentUserService.getCurrentUser(userDetails);
+        User user = userDetails.getUser();
         authService.withdraw(user, dto);
         return ResponseEntity.noContent().build();
     }

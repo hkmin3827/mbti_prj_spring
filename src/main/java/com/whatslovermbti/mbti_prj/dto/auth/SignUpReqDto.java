@@ -1,7 +1,6 @@
 package com.whatslovermbti.mbti_prj.dto.auth;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -3,7 +3,6 @@ package com.whatslovermbti.mbti_prj.service.ocr;
 import com.whatslovermbti.mbti_prj.receipt.model.ReceiptInfo;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class ReceiptScoringService {
     public int score(ReceiptInfo info) {

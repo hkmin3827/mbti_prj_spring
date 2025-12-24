@@ -1,7 +1,5 @@
-package com.whatslovermbti.mbti_prj.service.weight;
+package com.whatslovermbti.mbti_prj.service.policy;
 
-import com.whatslovermbti.mbti_prj.entity.Keyword;
-import com.whatslovermbti.mbti_prj.repository.MbtiKeywordWeightRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class MbtiKeywordWeightPolicy {
+public class BehaviorDilutionPolicy {
 
     private static final double DILUTION_RATIO = 0.4;
 

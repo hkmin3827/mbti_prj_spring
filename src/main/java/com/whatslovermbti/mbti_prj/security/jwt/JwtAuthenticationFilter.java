@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.security.jwt;
 
-
 //JWT를 읽어서 인증객체 생성하는 핵심 필터
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -15,12 +14,27 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final CustomUserDetailsService userDetailsService;
+
+    /* JWT 필터 자체를 타지 않을 경로들
+     * - 후보군 수집
+     * - 테스트 API
+     * - 인증/소셜 로그인
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        return uri.startsWith("/auth/")
+                || uri.startsWith("/oauth2/")
+                || uri.startsWith("/login/oauth2/")
+                || uri.startsWith("/test/places/");
+    }
+
 
     @Override
     protected void doFilterInternal(

@@ -6,21 +6,25 @@ import com.whatslovermbti.mbti_prj.constant.Role;
 import com.whatslovermbti.mbti_prj.dto.auth.LoginReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.SignUpReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.WithdrawReqDto;
+import com.whatslovermbti.mbti_prj.infra.kakao.KakaoUnlinkClient;
 import com.whatslovermbti.mbti_prj.security.oauth.userInfo.OAuthUserInfo;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final KakaoUnlinkClient kakaoUnlinkClient;
 
     // 회원가입
     public void signup(SignUpReqDto dto) {
@@ -91,9 +95,17 @@ public class AuthService {
             }
         }
 
+        // 카카오면 제공자랑 계정 연결까지 해제
+        if (user.getProvider() == Provider.KAKAO) {
+            try {
+                kakaoUnlinkClient.unlink(user.getOauthId());
+            } catch (Exception e) {
+                log.warn("Kakao unlink failed", e);
+            }
+        }
+
         // 삭제
         userRepository.delete(user);
         // → DB에서 ON DELETE CASCADE로 연관 엔티티 자동 삭제
     }
 }
-
