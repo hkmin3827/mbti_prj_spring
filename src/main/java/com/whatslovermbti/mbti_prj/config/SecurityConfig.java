@@ -38,7 +38,8 @@ public class SecurityConfig {
 //                                "/login",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
-                                "/test/places/**"
+                                "/test/places/**",
+                                "/api/test/llm/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(

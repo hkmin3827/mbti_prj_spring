@@ -1,15 +1,13 @@
 package com.whatslovermbti.mbti_prj.entity;
-// 추후 지도 외부 API 사용 시 키워드 받아올때 내부 표준 키워드로 정규화
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class KeywordNormalization {
 
     @Id
@@ -23,4 +21,12 @@ public class KeywordNormalization {
     // 내부 표준 키워드
     @ManyToOne(fetch = FetchType.LAZY)
     private Keyword standardKeyword;
+
+    public KeywordNormalization(
+            String rawKeyword,
+            Keyword standardKeyword
+    ) {
+        this.rawKeyword = rawKeyword;
+        this.standardKeyword = standardKeyword;
+    }
 }

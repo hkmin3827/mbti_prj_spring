@@ -22,7 +22,7 @@ public class BookmarkController {
     private final UserActionQueryService userActionQueryService;
 
     @PostMapping("/places/{placeId}")
-    public void save(
+    public void saveBookmark(
             @PathVariable Long placeId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "SELF") MbtiContext context
@@ -33,7 +33,7 @@ public class BookmarkController {
     }
 
     @DeleteMapping("/places/{placeId}")
-    public void unsave(
+    public void unsaveBookmark(
             @PathVariable Long placeId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "SELF") MbtiContext context

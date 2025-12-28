@@ -8,6 +8,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"user_id", "receipt_hash"}
+                )
+        }
+)
 public class Review {
 
     @Id
@@ -29,9 +36,12 @@ public class Review {
     private String reviewImageUrl;
 
     private boolean verified; // 영수증 인증 여부
-
     @Column(nullable = true)
     private String receiptImageUrl;
+    @Column(length = 64)
+    private String receiptHash;
+
+    private Integer placeMatchScore;
 
     private LocalDateTime createdAt;
     @PrePersist

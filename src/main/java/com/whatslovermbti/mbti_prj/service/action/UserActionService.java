@@ -31,7 +31,6 @@ public class UserActionService {
     // VIEW 행동 진입점
     public void onPlaceClicked(User user, PlaceSnapshot snapshot, MbtiContext context) {
         Place place = placeResolver.resolve(snapshot);
-
         recordView(user.getId(), place.getId(), context);
     }
 
@@ -66,8 +65,7 @@ public class UserActionService {
                         .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
 
         // 북마크 삭제
-        placeBookmarkRepository
-                .deleteByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context);
+        placeBookmarkRepository.delete(bookmark);
 
         // 가중치 되돌리기
         applyUserAction(user, place, ActionType.UNSAVE, context);

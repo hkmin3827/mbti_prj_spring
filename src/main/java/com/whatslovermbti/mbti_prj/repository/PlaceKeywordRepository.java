@@ -10,4 +10,6 @@ import java.util.List;
 public interface PlaceKeywordRepository extends JpaRepository<PlaceKeyword, Long> {
     List<PlaceKeyword> findByPlace(Place place);
     boolean existsByPlaceAndKeyword(Place place, Keyword keyword);
+
+    void deleteByPlaceId(Long placeId);
 }

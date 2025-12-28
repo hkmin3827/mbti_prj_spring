@@ -3,7 +3,8 @@ package com.whatslovermbti.mbti_prj.controller;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
-import com.whatslovermbti.mbti_prj.service.ReviewService;
+import com.whatslovermbti.mbti_prj.service.review.ReviewQueryService;
+import com.whatslovermbti.mbti_prj.service.review.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/reviews")
 public class ReviewController {
 
+    private final ReviewQueryService reviewQueryService;
     private final ReviewService reviewService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -49,7 +51,7 @@ public class ReviewController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return reviewService.getReviewBoard(page, size);
+        return reviewQueryService.getReviewBoard(page, size);
     }
 
     @GetMapping("/me")
@@ -59,7 +61,7 @@ public class ReviewController {
             @RequestParam(defaultValue = "10") int size
     ) {
         User user = userDetails.getUser();
-        return reviewService.getMyReviews(
+        return reviewQueryService.getMyReviews(
                 user,
                 page,
                 size

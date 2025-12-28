@@ -1,6 +1,9 @@
 package com.whatslovermbti.mbti_prj.service.keyword;
 
+import com.whatslovermbti.mbti_prj.constant.MbtiAxis;
 import com.whatslovermbti.mbti_prj.entity.Keyword;
+import com.whatslovermbti.mbti_prj.entity.KeywordNormalization;
+import com.whatslovermbti.mbti_prj.repository.KeywordNormalizationRepository;
 import com.whatslovermbti.mbti_prj.repository.KeywordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,22 +17,56 @@ import java.util.List;
 public class KeywordService {
 
     private final KeywordRepository keywordRepository;
+    private final KeywordNormalizationRepository keywordNormalizationRepository;
+    private final KeywordNormalizationService keywordNormalizationService;
 
     /**
-     * 키워드 단건 생성 (관리자/시드용)
+     * 단독 표준 키워드 단건 생성 (변이 없음)
+     * (관리자/시드용)
      */
-    public Keyword createKeyword(String name) {
+    public Keyword createKeyword(String standardName, MbtiAxis axis) {
 
-        String normalized = normalize(name);
+        String standard =
+                standardName.trim().toLowerCase();
 
-        if (keywordRepository.existsByName(normalized)) {
+        if (keywordRepository.existsByName(standard)) {
             throw new IllegalArgumentException("이미 존재하는 키워드입니다.");
         }
 
-        Keyword keyword = new Keyword();
-        keyword.setName(normalized);
+        return keywordRepository.save(
+                new Keyword(standard, axis)
+        );
+    }
 
-        return keywordRepository.save(keyword);
+    // 표준 키워드 + 형태 변이 세트 생성
+    public Keyword createKeywordWithNormalizations(
+            String standardName,
+            MbtiAxis axis,
+            List<String> variants
+    ) {
+
+        String standard =
+                standardName.trim().toLowerCase();
+
+        if (keywordRepository.existsByName(standard)) {
+            throw new IllegalArgumentException("이미 존재하는 표준 키워드입니다.");
+        }
+
+        Keyword keyword =
+                keywordRepository.save(
+                        new Keyword(standard, axis)
+                );
+
+        for (String variant : variants) {
+            String raw =
+                    variant.trim().toLowerCase();
+
+            keywordNormalizationRepository.save(
+                    new KeywordNormalization(raw, keyword)
+            );
+        }
+
+        return keyword;
     }
 
     /**
@@ -45,30 +82,17 @@ public class KeywordService {
      */
     @Transactional(readOnly = true)
     public Keyword getByName(String name) {
-        return keywordRepository.findByName(normalize(name))
+        return keywordRepository.findByName(name.trim().toLowerCase())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 키워드입니다."));
     }
 
     /**
-     * 장소 등록 시: 키워드가 있으면 재사용, 없으면 생성
-     * (※ 지금은 관리자/내부 로직에서만 사용)
+     * 장소 등록 시: 표준 키워드 조회
+     * 없으면 예외 (자동 생성 ❌)
      */
-    public Keyword getOrCreate(String name) {
+    public Keyword getOrThrow(String name) {
 
-        String normalized = normalize(name);
-
-        return keywordRepository.findByName(normalized)
-                .orElseGet(() -> {
-                    Keyword k = new Keyword();
-                    k.setName(normalized);
-                    return keywordRepository.save(k);
-                });
+        return keywordNormalizationService.normalize(name);
     }
 
-    /**
-     * 키워드 정규화 (중요)
-     */
-    private String normalize(String name) {
-        return name.trim().toLowerCase();
-    }
 }

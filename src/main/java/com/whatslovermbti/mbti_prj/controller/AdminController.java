@@ -59,4 +59,20 @@ public class AdminController {
         adminService.deleteReview(reviewId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{placeId}/soft-delete")
+    public ResponseEntity<Void> softDeletePlace(
+            @PathVariable Long placeId
+    ) {
+        adminService.softDeletePlace(placeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{placeId}")
+    public ResponseEntity<Void> hardDeletePlace(
+            @PathVariable Long placeId
+    ) {
+        adminService.hardDeletePlace(placeId);
+        return ResponseEntity.noContent().build();
+    }
 }

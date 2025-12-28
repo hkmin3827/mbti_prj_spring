@@ -64,6 +64,9 @@ dependencies {
 	// 캐시 TTL
 	implementation 'com.github.ben-manes.caffeine:caffeine'
 	implementation 'org.springframework:spring-context-support'
+
+	// GEMINI
+	implementation("com.google.genai:google-genai:1.8.0")
 }
 tasks.named('test') {
 	useJUnitPlatform()

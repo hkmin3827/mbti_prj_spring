@@ -27,4 +27,8 @@ public class PlaceKeyword {
         this.keyword = keyword;
         this.weight = weight; // 기본 신뢰도
     }
+
+    public void increaseWeight(int delta) {
+        this.weight += delta;
+    }
 }

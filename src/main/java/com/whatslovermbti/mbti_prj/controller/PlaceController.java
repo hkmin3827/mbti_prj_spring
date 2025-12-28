@@ -2,10 +2,12 @@ package com.whatslovermbti.mbti_prj.controller;
 
 import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
+import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import com.whatslovermbti.mbti_prj.service.place.PlaceSearchService;
+import com.whatslovermbti.mbti_prj.service.place.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlaceController {
 
     private final PlaceSearchService placeSearchService;
+    private final PlaceService placeService;
 
+    @GetMapping("/detail")
+    public Place getDetails(
+            @RequestParam Long placeId
+    ) {
+        return placeService.getPlaceDetail(placeId);
+    }
     /**
      * 통합 장소 검색
      * - 위치 필수

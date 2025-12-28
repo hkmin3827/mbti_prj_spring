@@ -18,4 +18,6 @@ public interface UserActionLogRepository extends JpaRepository<UserActionLog, Lo
             LocalDateTime start,
             LocalDateTime end
     );
+
+    void deleteByPlaceId(Long placeId);
 }

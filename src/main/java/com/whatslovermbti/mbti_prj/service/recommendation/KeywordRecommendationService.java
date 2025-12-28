@@ -45,35 +45,28 @@ public class KeywordRecommendationService {
         boolean isOpposite =
                 policy.isOpposite(mbtiWeight);
 
-        // ✅ AI 보정 훅 (지금은 0, 추후 모델 연결)
-        double aiBoost = getAiBoost(user, keyword);
 
         double score =
                 policy.applyDilution(
                         mbtiWeight,
                         userPreference,
                         isOpposite
-                )  + aiBoost;
+                );
 
 
         // ^^^^^ mbti별로 바뀌는 지 확인용 로그
         if (mbtiWeight != 0 || userPreference != 0) {
             log.info(
-                    "[KEYWORD_SCORE] mbti={}, keyword={}, mbtiWeight={}, userPref={}, aiBoost={}, final={}",
+                    "[KEYWORD_SCORE] mbti={}, keyword={}, mbtiWeight={}, userPref={}, final={}",
                     mbti,
                     keyword.getName(),
                     mbtiWeight,
                     userPreference,
-                    aiBoost,
                     score
             );
         }
         // ^^^^^ 여기까지
 
         return Math.max(score, MBTI_MIN_FLOOR);
-    }
-
-    private double getAiBoost(User user, Keyword keyword) {
-        return 0.0;
     }
 }

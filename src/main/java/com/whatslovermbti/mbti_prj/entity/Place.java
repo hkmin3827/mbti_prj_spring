@@ -25,6 +25,7 @@ public class Place {
     private Category category;
 
     private String address;
+    private String roadAddress;
     private Double longitude;   // 경도
     private Double latitude;   // 위도
 

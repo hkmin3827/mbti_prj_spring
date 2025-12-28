@@ -1,5 +1,7 @@
 package com.whatslovermbti.mbti_prj.service.s3;
 
+import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 import java.time.Duration;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,30 +26,94 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String createPresignedUploadUrl(String folder, String fileName) {
+    private static final Set<String> ALLOWED_FOLDERS = Set.of(
+            "reviews",
+            "profiles",
+            "places",
+            "receipts"
+    );
 
-        String key = folder + "/" + fileName;
+    public PresignedUpload createPresignedUpload(
+            String folder,
+            String originalFileName,
+            String contentType
+    ) {
+        validateFolder(folder);
+        validateFileName(originalFileName);
+        validateContentType(contentType);
+
+        String storedFileName = generateStoredFileName(originalFileName);
+        String key = folder + "/" + storedFileName;
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
+                .contentType(contentType)
                 .build();
 
-        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
-                .putObjectRequest(objectRequest)
-                .build();
+        PutObjectPresignRequest presignRequest =
+                PutObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofMinutes(10))
+                        .putObjectRequest(objectRequest)
+                        .build();
 
-        PresignedPutObjectRequest presignedRequest =
+        PresignedPutObjectRequest presigned =
                 presigner.presignPutObject(presignRequest);
 
-        return presignedRequest.url().toString();
+        return new PresignedUpload(
+                presigned.url().toString(),
+                getFileUrl(key)
+        );
     }
 
     public String getFileUrl(String folder, String fileName) {
         return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/"
                 + folder + "/" + fileName;
     }
+    /* ================= 검증 로직 ================= */
+
+    private void validateFolder(String folder) {
+        if (!ALLOWED_FOLDERS.contains(folder)) {
+            throw new CustomException(ErrorCode.INVALID_UPLOAD_FOLDER);
+        }
+    }
+
+    private void validateFileName(String fileName) {
+        if (fileName.contains("..") || fileName.contains("/")) {
+            throw new CustomException(ErrorCode.INVALID_FILE_NAME);
+        }
+    }
+
+    private void validateContentType(String contentType) {
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new CustomException(ErrorCode.INVALID_CONTENT_TYPE);
+        }
+    }
+
+    private String generateStoredFileName(String originalFileName) {
+        String ext = "";
+
+        int idx = originalFileName.lastIndexOf('.');
+        if (idx != -1) {
+            ext = originalFileName.substring(idx);
+        }
+
+        return UUID.randomUUID() + ext;
+    }
+
+    private String getFileUrl(String key) {
+        return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + key;
+    }
+
+    /* ================= DTO ================= */
+
+    public record PresignedUpload(
+            String uploadUrl,
+            String fileUrl
+    ) {}
+
+
+
 
     // presigned랑 별개로 서버에서 직접 올리는 방식 : 리뷰이미지 업로드 확인용. ocr에도 적용 가능
     public String uploadFile(MultipartFile file, String folder) {

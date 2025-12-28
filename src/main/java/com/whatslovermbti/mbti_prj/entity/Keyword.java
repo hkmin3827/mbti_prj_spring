@@ -2,18 +2,14 @@ package com.whatslovermbti.mbti_prj.entity;
 
 import com.whatslovermbti.mbti_prj.constant.MbtiAxis;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Keyword {
 
     @Id
@@ -30,4 +26,9 @@ public class Keyword {
 
     @OneToMany(mappedBy = "keyword")
     private List<PlaceKeyword> placeKeywords = new ArrayList<>();
+
+    public Keyword(String name, MbtiAxis axis) {
+        this.name = name;
+        this.axis = axis;
+    }
 }

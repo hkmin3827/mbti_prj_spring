@@ -19,16 +19,19 @@ public class S3Controller {
     private final S3Service s3Service;
 
     @GetMapping("/upload-url")
-    public ResponseEntity<Map<String, String>> getUploadUrl(
+    public ResponseEntity<S3Service.PresignedUpload> getUploadUrl(
             @RequestParam String folder,
-            @RequestParam String fileName
+            @RequestParam String originalFileName,
+            @RequestParam(defaultValue = "image/jpeg") String contentType
     ) {
-        String url = s3Service.createPresignedUploadUrl(folder, fileName);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("uploadUrl", url);
-        response.put("fileUrl", s3Service.getFileUrl(folder, fileName));
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                s3Service.createPresignedUpload(
+                        folder,
+                        originalFileName,
+                        contentType
+                )
+        );
     }
+
+
 }

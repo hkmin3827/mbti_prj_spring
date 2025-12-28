@@ -125,4 +125,16 @@ public class PlaceKeywordMapper {
         }
         return false;
     }
+
+    public void adjustWeights(
+            Place place,
+            Map<Keyword, Integer> adjustments
+    ) {
+        for (PlaceKeyword pk : place.getPlaceKeywords()) {
+            Integer delta = adjustments.get(pk.getKeyword());
+            if (delta == null) continue;
+
+            pk.increaseWeight(delta);
+        }
+    }
 }

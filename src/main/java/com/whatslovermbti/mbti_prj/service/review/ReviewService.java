@@ -1,10 +1,11 @@
-package com.whatslovermbti.mbti_prj.service;
+package com.whatslovermbti.mbti_prj.service.review;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
+import com.whatslovermbti.mbti_prj.receipt.model.ReceiptInfo;
 import com.whatslovermbti.mbti_prj.receipt.model.ScoreVO;
 import com.whatslovermbti.mbti_prj.repository.PlaceRepository;
 import com.whatslovermbti.mbti_prj.repository.ReviewRepository;
@@ -13,9 +14,8 @@ import com.whatslovermbti.mbti_prj.service.ocr.ReceiptVerificationService;
 import com.whatslovermbti.mbti_prj.service.s3.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -32,6 +33,7 @@ public class ReviewService {
     private final PlaceRepository placeRepository;
     private final ReceiptVerificationService receiptVerificationService;
     private final S3Service s3Service;
+    private final PlaceMatcher placeMatcher;
 
     public Review createReview(
             User user,
@@ -73,10 +75,20 @@ public class ReviewService {
         ScoreVO result =
                 receiptVerificationService.verify(lines);
 
+        // 영수증 중복 검사
+        String receiptHash = generateReceiptHash(result.getReceipt());
+        boolean alreadyUsed =
+                reviewRepository.existsByUserIdAndReceiptHash(
+                        user.getId(),
+                        receiptHash
+                );
+        if (alreadyUsed) {
+            throw new CustomException(ErrorCode.DUPLICATE_RECEIPT_REVIEW);
+        }
 
-//        이후
-//        placeMatcher.match(place, result.getReceipt());
-
+        // 장소 매칭
+        int matchScore = placeMatcher.match(place, result.getReceipt());
+        review.setPlaceMatchScore(matchScore);
 
         // 신뢰도 기준으로 인증 여부 결정
         review.setVerified(result.isVerified());
@@ -89,17 +101,59 @@ public class ReviewService {
     }
 
 
-    // 후기게시판 : 전체 리뷰 조회(최신순)
-    public Page<Review> getReviewBoard(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+    private String generateReceiptHash(ReceiptInfo receipt) {
+
+        String raw =
+                receipt.getStoreName() + "|" +
+                        receipt.getDate() + "|" +
+                        receipt.getTotalAmount();
+
+        return DigestUtils.sha256Hex(raw);
     }
 
-    /**
-     * ✅ 내 리뷰 조회 (삭제된 place 제외 버전 기본)
-     */
-    public Page<Review> getMyReviews(User user, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return reviewRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable);
+    public void updateReview(
+            Long reviewId,
+            User user,
+            int rating,
+            String content,
+            String reviewImageUrl,
+            boolean removeImage
+    ) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+        // 본인 검증
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // 수정
+        review.setRating(rating);
+        review.setContent(content);
+
+        // 이미지 새로 들어오면 기존거 덮어쓰기
+        if(reviewImageUrl != null){
+            review.setReviewImageUrl(reviewImageUrl);
+        }
+        // 추가 이미지 없고 removeImage true면 이미지 제거
+        else if (removeImage) {
+            review.setReviewImageUrl(null);
+        }
     }
+
+    public void deleteReview(
+            Long reviewId,
+            User user
+    ) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+        // 본인 검증
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        reviewRepository.delete(review);
+    }
+
 }

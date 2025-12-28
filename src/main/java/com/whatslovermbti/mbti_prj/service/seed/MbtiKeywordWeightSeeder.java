@@ -61,7 +61,7 @@ public class MbtiKeywordWeightSeeder implements CommandLineRunner {
 
         seed(MbtiAxis.F, Map.of(
                 "로맨틱한", 20,
-                "데이트", 15
+                "데이트하기좋은", 15
         ), keywordMap);
 
         seed(MbtiAxis.T, Map.of(
