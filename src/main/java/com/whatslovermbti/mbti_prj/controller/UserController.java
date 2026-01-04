@@ -23,7 +23,15 @@ public class UserController {
                 user.getProvider(),
                 user.getName(),
                 user.getOauthId(),
-                user.getId()
+                user.getId(),
+                user.getMbti(),
+                user.getPartnerMbti(),
+                user.getProfileImage(),
+                user.getTelnum(),
+                user.isProfileCompleted(),
+                user.isActive(),
+                user.getCreatedAt()
+
         );
     }
 }

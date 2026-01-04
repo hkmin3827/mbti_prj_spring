@@ -37,9 +37,7 @@ public class AuthService {
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setProvider(Provider.LOCAL);
-        user.setPartnerMbti(dto.getPartnerMbti());
         user.setName(dto.getName());
-        user.setMbti(dto.getMbti());
         user.setRole(Role.USER);
         user.setTelnum(dto.getTelnum());
 

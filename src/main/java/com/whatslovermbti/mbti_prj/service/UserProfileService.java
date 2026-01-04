@@ -1,6 +1,8 @@
 package com.whatslovermbti.mbti_prj.service;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.dto.user.BasicProfileReq;
+import com.whatslovermbti.mbti_prj.dto.user.MbtiProfileReq;
 import com.whatslovermbti.mbti_prj.dto.user.ProfileReqDto;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
@@ -17,29 +19,42 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
 
-    public void createProfile(Long userId, ProfileReqDto dto){
+    public void createBasicProfile(Long userId, BasicProfileReq dto){
 
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (user.getMbti() != null) {
+        if (dto.getName() == null || dto.getTelnum() == null) {
+            throw new CustomException(ErrorCode.PROFILE_NOT_COMPLETED);
+        }
+
+        user.updateBasicProfile(
+                dto.getName(),
+                dto.getProfileImage(),
+                dto.getTelnum()
+        );
+
+        user.profileCompleted();
+    }
+
+    public void createMbtiProfile(Long userId, MbtiProfileReq dto){
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (user.getMbti()!= null){
             throw new CustomException(ErrorCode.PROFILE_ALREADY_EXISTS);
         }
-        if (dto.getMbti() == null || dto.getTelnum() == null) {
+
+        if (dto.getMbti() == null){
             throw new CustomException(ErrorCode.PROFILE_NOT_COMPLETED);
         }
 
         MbtiValidator.validate(dto.getMbti());
-        user.updateProfile(
-                dto.getName(),
-                dto.getProfileImage(),
+        user.updateMbtiProfile(
                 dto.getMbti(),
-                dto.getPartnerMbti(),
-                dto.getTelnum()
+                dto.getPartnerMbti()
         );
     }
-
-    public void modifyProfile(Long userId, ProfileReqDto dto) {
+    public void modifyBasicProfile(Long userId,BasicProfileReq dto) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
@@ -51,27 +66,40 @@ public class UserProfileService {
         String finalProfileImage =
                 dto.getProfileImage() != null ? dto.getProfileImage() : user.getProfileImage();
 
+        String finalTelnum =
+                dto.getTelnum() != null ? dto.getTelnum() : user.getTelnum();
+
+        if (finalName == null || finalTelnum == null) {
+            throw new CustomException(ErrorCode.PROFILE_NOT_COMPLETED);
+        }
+
+        user.updateBasicProfile(
+                finalName,
+                finalProfileImage,
+                finalTelnum
+        );
+    }
+    public void modifyMbtiProfile(Long userId, MbtiProfileReq dto){
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
         String finalMbti =
                 dto.getMbti() != null ? dto.getMbti() : user.getMbti();
 
         String finalPartnerMbti =
                 dto.getPartnerMbti() != null ? dto.getPartnerMbti() : user.getPartnerMbti();
 
-        String finalTelnum =
-                dto.getTelnum() != null ? dto.getTelnum() : user.getTelnum();
-
-        if (finalMbti == null || finalTelnum == null) {
+        if (finalMbti == null) {
             throw new CustomException(ErrorCode.PROFILE_NOT_COMPLETED);
         }
 
         MbtiValidator.validate(dto.getMbti());
 
-        user.updateProfile(
-                finalName,
-                finalProfileImage,
-                finalMbti,
-                finalPartnerMbti,
-                finalTelnum
+        user.updateMbtiProfile(
+                dto.getMbti(),
+                dto.getPartnerMbti()
         );
+
     }
 }

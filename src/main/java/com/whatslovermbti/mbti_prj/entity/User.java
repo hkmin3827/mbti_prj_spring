@@ -46,6 +46,9 @@ public class User {
     private String telnum;
 
     @Column(nullable = false)
+    private boolean profileCompleted = false;
+
+    @Column(nullable = false)
     private boolean isActive = true;
 
     @Column(nullable = false, updatable = false)
@@ -57,13 +60,17 @@ public class User {
     }
 
 
-    public void updateProfile(String name, String profileImage, String mbti, String partnerMbti, String telnum) {
+    public void updateBasicProfile(String name, String profileImage, String telnum) {
         this.name =name;
         this.profileImage = profileImage;
-        this.mbti = mbti;
-        this.partnerMbti = partnerMbti;
         this.telnum = telnum;
     }
+    public void updateMbtiProfile(String mbti, String partnerMbti){
+        this.mbti = mbti;
+        this.partnerMbti = partnerMbti;
+    }
+
+    public void profileCompleted(){this.profileCompleted = true;}
 
     public void activate() {
         this.isActive = true;

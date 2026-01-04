@@ -38,7 +38,7 @@ public class AuthController {
 
         String token = jwtProvider.createToken(user.getId());
 
-        return ResponseEntity.ok(new TokenResDto(token));
+        return ResponseEntity.ok(new TokenResDto(token, user.isProfileCompleted()));
 
     }
 

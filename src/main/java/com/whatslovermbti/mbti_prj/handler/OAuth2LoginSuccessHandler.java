@@ -43,23 +43,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         // userId 기준 JWT 발급
         String token = jwtProvider.createToken(user.getId());
+        String redirectUrl =
+                "http://localhost:5173/oauth/callback?token=" + token;
 
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("""
-            {
-              "id": %d,
-              "email": "%s",
-              "provider": "%s",
-              "oauthId": "%s",
-              "token": "%s"
-            }
-        """.formatted(
-                user.getId(),
-                user.getEmail(),
-                user.getProvider(),
-                user.getOauthId(),
-                token
-        ));
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+
     }
 
     /**

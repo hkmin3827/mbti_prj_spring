@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.controller;
 
+import com.whatslovermbti.mbti_prj.dto.review.ReviewUpdateReqDto;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
@@ -44,6 +45,34 @@ public class ReviewController {
         );
 
         return ResponseEntity.ok(review.getId());
+    }
+
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<Void> updateReview(
+            @PathVariable Long reviewId,
+            @RequestBody ReviewUpdateReqDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ){
+        User user = userDetails.getUser();
+        reviewService.updateReview(
+                reviewId,
+                user,
+                dto.getRating(),
+                dto.getContent(),
+                dto.getReviewImageUrl(),
+                dto.isRemoveImage()
+        );
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long reviewId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        User user = userDetails.getUser();
+        reviewService.deleteReview(reviewId, user);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

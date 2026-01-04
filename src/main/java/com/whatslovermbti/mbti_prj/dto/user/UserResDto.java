@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,4 +18,11 @@ public class UserResDto {
     private String name;
     private String oauthId;
     private Long id;
+    private String mbti;
+    private String partnerMbti;
+    private String profileImage;
+    private String telnum;
+    private Boolean profileCompleted;
+    private Boolean isActive;
+    private LocalDateTime createdAt;
 }

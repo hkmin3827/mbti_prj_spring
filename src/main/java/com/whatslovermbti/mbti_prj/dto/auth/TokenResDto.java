@@ -7,4 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TokenResDto {
     private String token;
+    private boolean profileCompleted;
 }

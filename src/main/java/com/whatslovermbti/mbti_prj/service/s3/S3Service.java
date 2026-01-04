@@ -27,8 +27,8 @@ public class S3Service {
     private String bucket;
 
     private static final Set<String> ALLOWED_FOLDERS = Set.of(
-            "reviews",
-            "profiles",
+            "review-images",
+            "profile",
             "places",
             "receipts"
     );
@@ -39,11 +39,11 @@ public class S3Service {
             String contentType
     ) {
         validateFolder(folder);
-        validateFileName(originalFileName);
         validateContentType(contentType);
 
-        String storedFileName = generateStoredFileName(originalFileName);
-        String key = folder + "/" + storedFileName;
+        String extension = extractExtension(originalFileName);
+        String key = folder + "/" + UUID.randomUUID() + extension;
+
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -77,29 +77,19 @@ public class S3Service {
             throw new CustomException(ErrorCode.INVALID_UPLOAD_FOLDER);
         }
     }
-
-    private void validateFileName(String fileName) {
-        if (fileName.contains("..") || fileName.contains("/")) {
-            throw new CustomException(ErrorCode.INVALID_FILE_NAME);
+    private String extractExtension(String originalFileName) {
+        int idx = originalFileName.lastIndexOf(".");
+        if (idx == -1) {
+            throw new CustomException(ErrorCode.INVALID_CONTENT_TYPE);
         }
+        return originalFileName.substring(idx);
     }
-
     private void validateContentType(String contentType) {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new CustomException(ErrorCode.INVALID_CONTENT_TYPE);
         }
     }
 
-    private String generateStoredFileName(String originalFileName) {
-        String ext = "";
-
-        int idx = originalFileName.lastIndexOf('.');
-        if (idx != -1) {
-            ext = originalFileName.substring(idx);
-        }
-
-        return UUID.randomUUID() + ext;
-    }
 
     private String getFileUrl(String key) {
         return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + key;

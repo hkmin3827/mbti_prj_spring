@@ -45,6 +45,7 @@ class ViewController {
     ) {
         return userActionQueryService.getRecentViews(userId, placeMapper);
     }
+
     @DeleteMapping("/{placeId}")
     public ResponseEntity<Void> removeViewHistory(
             @AuthenticationPrincipal CustomUserDetails userDetails,

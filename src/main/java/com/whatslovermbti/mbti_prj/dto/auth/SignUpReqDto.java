@@ -11,8 +11,6 @@ public class SignUpReqDto {
     private String email;
     private String password;
     private String name;
-    private String mbti;
-    private String partnerMbti;
     private Provider provider;
 
     private String telnum;
