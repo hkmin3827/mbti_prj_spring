@@ -1,7 +1,6 @@
 package com.whatslovermbti.mbti_prj.service.review;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
-import com.whatslovermbti.mbti_prj.dto.place.PlaceDetailResponse;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
@@ -12,18 +11,17 @@ import com.whatslovermbti.mbti_prj.repository.PlaceRepository;
 import com.whatslovermbti.mbti_prj.repository.ReviewRepository;
 import com.whatslovermbti.mbti_prj.service.ocr.GoogleVisionOcrService;
 import com.whatslovermbti.mbti_prj.service.ocr.ReceiptVerificationService;
+import com.whatslovermbti.mbti_prj.service.place.PlaceRatingService;
 import com.whatslovermbti.mbti_prj.service.s3.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +35,7 @@ public class ReviewService {
     private final ReceiptVerificationService receiptVerificationService;
     private final S3Service s3Service;
     private final PlaceMatcher placeMatcher;
+    private final PlaceRatingService placeRatingService;
 
     public void increaseViewCount(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
@@ -106,7 +105,11 @@ public class ReviewService {
         String receiptUrl = s3Service.uploadFile(receiptImage, "receipts");
         review.setReceiptImageUrl(receiptUrl);
 
-        return reviewRepository.save(review);
+        Review saved = reviewRepository.save(review);
+
+        placeRatingService.recalcPlaceRating(placeId);
+
+        return saved;
     }
 
 
@@ -148,6 +151,8 @@ public class ReviewService {
         else if (removeImage) {
             review.setReviewImageUrl(null);
         }
+
+        placeRatingService.recalcPlaceRating(review.getPlace().getId());
     }
 
     public void deleteReview(
@@ -163,5 +168,7 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
+
+        placeRatingService.recalcPlaceRating(review.getPlace().getId());
     }
 }

@@ -48,20 +48,19 @@ public class KeywordWeightAggregator {
                                 Collectors.summingInt(MbtiKeywordWeight::getWeight)
                         ));
 
-        map.entrySet().stream()
-                .limit(5)
-                .forEach(e -> log.info("[MBTI_WEIGHT] keywordName={}, weight={}", e.getKey(), e.getValue()));
-
+        map.forEach((k, v) ->
+                log.info("[MBTI_WEIGHT] keywordName={}, weight={}", k, v)
+        );
         return map;
     }
 
     // 사용자 행동 기반 키워드 선호 Map : 키워드 이름 기준
-    public Map<String, Integer> getUserKeywordPreferenceMapByName(User user) {
+    public Map<String, Double> getUserKeywordPreferenceMapByName(User user) {
         return userKeywordPreferenceRepository.findAllByUser(user).stream()
                 .collect(Collectors.toMap(
                         p -> p.getKeyword().getName(),
                         UserKeywordPreference::getScore,
-                        Integer::sum
+                        Double::sum
                 ));
     }
 
@@ -69,20 +68,20 @@ public class KeywordWeightAggregator {
     // 통합 키워드 점수 Map : 키워드 이름 기준
     // Mbti 기본 가중치 + 유저 행동 가중치
     // 희석 정책/ MbtiScoreCalculator 확장 필요
-    public Map<String, Integer> getCombinedKeywordWeightMapByName(
+    public Map<String, Double> getCombinedKeywordWeightMapByName(
             User user,
             String targetMbti
     ) {
-        Map<String, Integer> result = new HashMap<>();
+        Map<String, Double> result = new HashMap<>();
 
         Map<String, Integer> mbtiWeights = getMbtiKeywordWeightMapByName(targetMbti);
-        Map<String, Integer> userPrefWeights = getUserKeywordPreferenceMapByName(user);
+        Map<String, Double> userPrefWeights = getUserKeywordPreferenceMapByName(user);
 
-        mbtiWeights.forEach((k, v) -> result.merge(k, v, Integer::sum));
-        userPrefWeights.forEach((k, v) -> result.merge(k, v, Integer::sum));
+        mbtiWeights.forEach((k, v) -> result.merge(k,  v.doubleValue(), Double::sum));
+        userPrefWeights.forEach((k, v) -> result.merge(k, v, Double::sum));
 
         // 0 제거(선택)
-        result.entrySet().removeIf(e -> e.getValue() == 0);
+        result.entrySet().removeIf(e -> Math.abs(e.getValue()) < 0.0001);
 
         return result;
     }
@@ -109,13 +108,13 @@ public class KeywordWeightAggregator {
     }
 
     // 유저 행동 기반 선호 Map (ID 기준)
-    public Map<Long, Integer> getUserKeywordPreferenceMapById(User user) {
+    public Map<Long, Double> getUserKeywordPreferenceMapById(User user) {
 
         return userKeywordPreferenceRepository.findAllByUser(user).stream()
                 .collect(Collectors.toMap(
                         p -> p.getKeyword().getId(),
                         UserKeywordPreference::getScore,
-                        Integer::sum
+                        Double::sum
                 ));
     }
 }

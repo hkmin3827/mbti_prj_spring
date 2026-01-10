@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.repository;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
+import com.whatslovermbti.mbti_prj.constant.Role;
 import com.whatslovermbti.mbti_prj.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,17 +17,26 @@ public interface UserRepository extends JpaRepository<User, Long> {
             String oauthId
     );
 
-    Optional<User> findById(Long Id);
+    /* ================= USER ROLE 전용 조회 ================= */
 
+    Page<User> findByRole(Role role, Pageable pageable);
 
+    Page<User> findByRoleAndNameContainingIgnoreCase(
+            Role role,
+            String name,
+            Pageable pageable
+    );
 
-    // 회원 전체 조회
-    Page<User> findAll(Pageable pageable);
-    // 활성/ 비활성 회원 전체 조회
-    Page<User> findByIsActive(boolean isActive, Pageable pageable);
+    Page<User> findByRoleAndIsActive(
+            Role role,
+            boolean isActive,
+            Pageable pageable
+    );
 
-    Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
-    Page<User> findByIsActiveAndNameContainingIgnoreCase(
-            boolean isActive, String name, Pageable pageable);
+    Page<User> findByRoleAndIsActiveAndNameContainingIgnoreCase(
+            Role role,
+            boolean isActive,
+            String name,
+            Pageable pageable
+    );
 }

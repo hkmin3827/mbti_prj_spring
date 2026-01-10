@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class KeywordService {
-
     private final KeywordRepository keywordRepository;
     private final KeywordNormalizationRepository keywordNormalizationRepository;
     private final KeywordNormalizationService keywordNormalizationService;

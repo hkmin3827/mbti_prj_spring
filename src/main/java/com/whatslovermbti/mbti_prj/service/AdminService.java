@@ -2,11 +2,14 @@ package com.whatslovermbti.mbti_prj.service;
 
 import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.constant.Role;
+import com.whatslovermbti.mbti_prj.dto.review.ReviewResponse;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.*;
+import com.whatslovermbti.mbti_prj.service.place.PlaceRatingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,7 @@ public class AdminService {
     private final PlaceReactionRepository placeReactionRepository;
     private final PlaceKeywordRepository placeKeywordRepository;
     private final UserActionLogRepository userActionLogRepository;
+    private final PlaceRatingService placeRatingService;
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
@@ -36,32 +40,40 @@ public class AdminService {
     public Page<User> getUsers(String keyword, Boolean active, Pageable pageable) {
 
         boolean hasKeyword = keyword != null && keyword.trim().length() >= 2;
+        Role targetRole = Role.USER;
 
         if (!hasKeyword && active == null) {
-            return userRepository.findAll(pageable); // 기본 전체 조회
+            return userRepository.findByRole(targetRole, pageable); // 기본 전체 조회
         }
 
         if (hasKeyword && active == null) {
-            return userRepository.findByNameContainingIgnoreCase(keyword, pageable);
+            return userRepository.findByRoleAndNameContainingIgnoreCase(
+                    targetRole, keyword, pageable);
         }
 
         if (!hasKeyword) {
-            return userRepository.findByIsActive(active, pageable);
+            return userRepository.findByRoleAndIsActive(
+                    targetRole, active, pageable
+            );
         }
 
-        return userRepository.findByIsActiveAndNameContainingIgnoreCase(
-                active, keyword, pageable
+        return userRepository.findByRoleAndIsActiveAndNameContainingIgnoreCase(
+                targetRole, active, keyword, pageable
         );
     }
 
     @Transactional(readOnly = true)
     public Page<User> getActiveUsers(Pageable pageable) {
-        return userRepository.findByIsActive(true, pageable);
+        return userRepository.findByRoleAndIsActive(
+                Role.USER, true, pageable
+        );
     }
 
     @Transactional(readOnly = true)
     public Page<User> getInactiveUsers(Pageable pageable) {
-        return userRepository.findByIsActive(false, pageable);
+        return userRepository.findByRoleAndIsActive(
+                Role.USER, false, pageable
+        );
     }
 
     public void activateUser(Long userId) {
@@ -81,28 +93,38 @@ public class AdminService {
         user.deactivate();
     }
 
+
     @Transactional(readOnly = true)
-    public Page<Review> getReviews(String placeName, Pageable pageable) {
+    public Page<ReviewResponse> getReviews(String placeName, Pageable pageable) {
 
         boolean hasPlaceName =
                 placeName != null && placeName.trim().length() >= 2;
 
-        // 기본: 전체 리뷰 (최신순)
+        Page<Review> page;
+
+        // 기본: 전체 리뷰
         if (!hasPlaceName) {
-            return reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+            page = reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+        } else {
+            // Place 이름으로 필터
+            page = reviewRepository
+                    .findByPlace_NameContainingIgnoreCaseOrderByCreatedAtDesc(
+                            placeName, pageable
+                    );
         }
 
-        // Place 이름으로 필터
-        return reviewRepository
-                .findByPlace_NameContainingIgnoreCaseOrderByCreatedAtDesc(
-                        placeName, pageable);
+        // ✅ 엔티티 -> DTO 변환 (LazyProxy 직렬화 문제 차단)
+        return page.map(ReviewResponse::from);
     }
 
+    @Transactional
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
         reviewRepository.delete(review);
+
+        placeRatingService.recalcPlaceRating(review.getPlace().getId());
     }
 
     @Transactional(readOnly = true)
@@ -142,6 +164,16 @@ public class AdminService {
         place.setDeleted(true);
     }
 
+    public void restorePlace(Long placeId){
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+        if (!place.isDeleted()) {
+            return; // 이미 활성 상태
+        }
+
+        place.setDeleted(false);
+    }
     @Transactional
     public void hardDeletePlace(Long placeId) {
 

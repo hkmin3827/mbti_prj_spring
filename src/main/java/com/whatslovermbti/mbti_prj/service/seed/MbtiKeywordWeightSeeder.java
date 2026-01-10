@@ -33,50 +33,77 @@ public class MbtiKeywordWeightSeeder implements CommandLineRunner {
         }
 
         // 시드 실행
-
-        // ✅ Keyword 한 번만 로딩
         Map<String, Keyword> keywordMap =
                 keywordRepository.findAll().stream()
                         .collect(Collectors.toMap(Keyword::getName, k -> k));
 
+
+        /* ================= I / E ================= */
+
         seed(MbtiAxis.I, Map.of(
-                "조용한", 25,
-                "아늑한", 15,
-                "시끌벅적한", -10
+                "조용한", 10,
+                "아늑한", 8,
+                "프라이빗한", 6,
+                "활동적인", -4,
+                "화려한", -5
         ), keywordMap);
+
         seed(MbtiAxis.E, Map.of(
-                "활동적인", 25,
-                "시끌벅적한", 20,
-                "조용한", -10
+                "활동적인", 10,
+                "화려한", 8,
+                "힙한", 6,
+                "조용한", -4,
+                "프라이빗한", -3
         ), keywordMap);
+
+        /* ================= N / S ================= */
+
         seed(MbtiAxis.N, Map.of(
-                "감성적인", 20,
-                "분위기좋은", 15
+                "감성적인", 10,
+                "분위기좋은", 8,
+                "감각적인", 6,
+                "실용적인", -4,
+                "가성비좋은", -3
         ), keywordMap);
 
         seed(MbtiAxis.S, Map.of(
-                "실용적인", 20,
-                "가성비", 15
+                "실용적인", 10,
+                "가성비좋은", 8,
+                "정갈한", 6,
+                "감성적인", -4,
+                "감각적인", -3
         ), keywordMap);
 
+        /* ================= F / T ================= */
+
         seed(MbtiAxis.F, Map.of(
-                "로맨틱한", 20,
-                "데이트하기좋은", 15
+                "로맨틱한", 10,
+                "따뜻한", 8,
+                "논리적인", -4,
+                "깔끔한", -3
         ), keywordMap);
 
         seed(MbtiAxis.T, Map.of(
-                "논리적인", 15,
-                "깔끔한", 15
+                "논리적인", 10,
+                "깔끔한", 8,
+                "로맨틱한", -4,
+                "따뜻한", -3
         ), keywordMap);
 
+        /* ================= J / P ================= */
+
         seed(MbtiAxis.J, Map.of(
-                "계획적인", 20,
-                "예약가능", 15
+                "계획적인", 10,
+                "예약가능", 8,
+                "즉흥적인", -5,
+                "자유로운", -3
         ), keywordMap);
 
         seed(MbtiAxis.P, Map.of(
-                "자유로운", 20,
-                "즉흥적인", 15
+                "즉흥적인", 10,
+                "자유로운", 8,
+                "계획적인", -5,
+                "예약가능", -3
         ), keywordMap);
 
         seedHistoryRepository.save(new AppSeedHistory("MBTI_KEYWORD_WEIGHT"));
@@ -87,8 +114,7 @@ public class MbtiKeywordWeightSeeder implements CommandLineRunner {
             Map<String, Integer> keywordWeights,
             Map<String, Keyword> keywordMap
     ) {
-
-        for (Map.Entry<String, Integer> entry : keywordWeights.entrySet()) {
+            for (Map.Entry<String, Integer> entry : keywordWeights.entrySet()) {
 
             String keywordName = entry.getKey();
             int weight = entry.getValue();

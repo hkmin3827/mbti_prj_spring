@@ -57,6 +57,21 @@ public class PlaceMapper {
         );
     }
 
+    // 북마크, 좋아요, 최근본 조회용 mapper
+    public PlaceResDto fromBasicEntity(
+            Place place,
+            Double distance
+    ) {
+        List<String> imageUrls = parseImages(place.getImages());
+
+        return PlaceResDto.fromEntity(
+                place,
+                imageUrls,
+                List.of(),   // 키워드 없음
+                distance
+        );
+    }
+
     private List<String> parseImages(String imagesJson) {
         if (imagesJson == null || imagesJson.isBlank()) return List.of();
         try {

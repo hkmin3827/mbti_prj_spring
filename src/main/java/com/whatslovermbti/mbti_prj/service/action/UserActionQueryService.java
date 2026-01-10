@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.service.action;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.whatslovermbti.mbti_prj.constant.ActionType;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.dto.place.PlaceBookmarkContextRow;
@@ -34,7 +33,7 @@ public class UserActionQueryService {
             Long userId
     ) {
 
-        // 1최신순으로 정렬된 bookmark row 조회
+        // 최신순으로 정렬된 bookmark row 조회
         List<PlaceBookmarkContextRow> rows =
                 placeBookmarkRepository.findBookmarkContextsByUser(userId);
 
@@ -71,7 +70,7 @@ public class UserActionQueryService {
                     Place place = placeMap.get(placeId);
                     if (place == null) return null;
 
-                    PlaceResDto dto = placeMapper.fromEntity(place, null);
+                    PlaceResDto dto = placeMapper.fromBasicEntity(place, null);
                     dto.setBookmarkedContext(bookmarkContextMap.get(placeId));
                     return dto;
                 })
@@ -92,7 +91,7 @@ public class UserActionQueryService {
                 .findLatestViewsPerPlace(userId)
                 .stream()
                 .limit(20)
-                .map(history -> placeMapper.fromEntity(history.getPlace(), null))
+                .map(history -> placeMapper.fromBasicEntity(history.getPlace(), null))
                 .toList();
     }
 
@@ -137,7 +136,7 @@ public class UserActionQueryService {
                     Place place = placeMap.get(placeId);
                     if (place == null) return null;
 
-                    PlaceResDto dto = placeMapper.fromEntity(place, null);
+                    PlaceResDto dto = placeMapper.fromBasicEntity(place, null);
                     dto.setLikedContexts(
                             likedContextMap.getOrDefault(placeId, Set.of())
                     );

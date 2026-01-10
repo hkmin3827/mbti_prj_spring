@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.controller;
 
 import com.whatslovermbti.mbti_prj.constant.Category;
+import com.whatslovermbti.mbti_prj.dto.review.ReviewResponse;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
@@ -57,13 +58,11 @@ public class AdminController {
     }
 
     @GetMapping("/reviews")
-    public ResponseEntity<Page<Review>> getReviews(
+    public ResponseEntity<Page<ReviewResponse>> getReviews(
             @RequestParam(required = false) String placeName,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                adminService.getReviews(placeName, pageable)
-        );
+        return ResponseEntity.ok(adminService.getReviews(placeName, pageable));
     }
 
     // 리뷰 삭제
@@ -89,6 +88,12 @@ public class AdminController {
     ) {
         adminService.softDeletePlace(placeId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PatchMapping("/{placeId}/restore")
+    public void restorePlace(@PathVariable Long placeId) {
+        adminService.restorePlace(placeId);
     }
 
     @DeleteMapping("/{placeId}")

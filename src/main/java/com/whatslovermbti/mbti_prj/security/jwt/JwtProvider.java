@@ -14,7 +14,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final JwtProperties jwtProperties;
-
     private final long EXPIRATION = 1000L * 60 * 60 * 24;
 
     public String createToken(Long userId) {

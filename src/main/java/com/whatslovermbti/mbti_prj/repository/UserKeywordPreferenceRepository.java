@@ -11,12 +11,6 @@ import java.util.Optional;
 
 public interface UserKeywordPreferenceRepository
         extends JpaRepository<UserKeywordPreference, Long> {
-    // 유저가 가진 모든 키워드 선호도
-    List<UserKeywordPreference> findByUser(User user);
-
-    // 키워드 기준으로 유저들 선호도 조회 (통계/AI용)
-    List<UserKeywordPreference> findByKeyword(Keyword keyword);
-
     List<UserKeywordPreference> findAllByUser(User user);
 
     Optional<UserKeywordPreference> findByUserAndKeywordAndTargetMbti(
@@ -24,4 +18,6 @@ public interface UserKeywordPreferenceRepository
             Keyword keyword,
             MbtiContext targetMbti
     );
+
+    List<UserKeywordPreference> findByUserAndTargetMbti(User user, MbtiContext targetMbti);
 }

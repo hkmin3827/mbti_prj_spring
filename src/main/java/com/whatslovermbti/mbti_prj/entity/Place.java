@@ -5,7 +5,6 @@ import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Getter @Setter
-@Where(clause = "deleted = false")
 public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,20 +63,7 @@ public class Place {
         this.deleted = false;
         this.deletedAt = null;
     }
-
-    public KakaoMapResponse.Document toKakaoDocument() {
-
-        KakaoMapResponse.Document doc = new KakaoMapResponse.Document();
-
-        doc.setId(this.kakaoPlaceId);
-        doc.setPlaceName(this.name);
-        doc.setAddressName(this.address);
-        doc.setLongitude(String.valueOf(this.longitude));
-        doc.setLatitude(String.valueOf(this.latitude));
-
-        // 카카오 스타일 category_name 형태로 복원
-        doc.setCategoryName(this.category.name());
-
-        return doc;
+    public void updateRating(double avg) {
+        this.rating = Math.round(avg * 10) / 10.0;
     }
 }

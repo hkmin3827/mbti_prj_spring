@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TargetMbtiResolver {
-
     public String resolve(User user, MbtiContext context) {
 
         if (context == MbtiContext.SELF) {

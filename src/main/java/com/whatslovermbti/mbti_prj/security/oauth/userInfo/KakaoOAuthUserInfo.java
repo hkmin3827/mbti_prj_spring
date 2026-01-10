@@ -4,7 +4,6 @@ import com.whatslovermbti.mbti_prj.constant.Provider;
 import java.util.Map;
 
 public class KakaoOAuthUserInfo implements OAuthUserInfo {
-
     private final Map<String, Object> attributes;
 
     public KakaoOAuthUserInfo(Map<String, Object> attributes) {

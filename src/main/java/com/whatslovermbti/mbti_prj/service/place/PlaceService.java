@@ -12,6 +12,7 @@ import com.whatslovermbti.mbti_prj.repository.PlaceReactionRepository;
 import com.whatslovermbti.mbti_prj.repository.PlaceRepository;
 import com.whatslovermbti.mbti_prj.service.action.UserActionQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class PlaceService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
 
         if (place.isDeleted()) {
-            throw new CustomException(ErrorCode.PLACE_DELETED);
+            throw new AccessDeniedException("해당 장소는 비활성화되어 접근할 수 없습니다.");
         }
 
         ActionType myReaction =

@@ -16,7 +16,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     List<Place> findAllByDeletedFalse();
 
-
     @Query("""
         select p
         from Place p
@@ -29,8 +28,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             @Param("token1") String token1,
             @Param("token2") String token2
     );
-
-
 
     Page<Place> findByNameContainingIgnoreCase(
             String name, Pageable pageable);

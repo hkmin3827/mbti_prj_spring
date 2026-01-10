@@ -1,11 +1,9 @@
 package com.whatslovermbti.mbti_prj.repository;
 
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
-import com.whatslovermbti.mbti_prj.dto.place.PlaceViewCountDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.PlaceViewHistory;
 import com.whatslovermbti.mbti_prj.entity.User;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +26,7 @@ public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHisto
     @Query("""
         select v
         from PlaceViewHistory v
-        join v.place p
+        join fetch v.place p
         where v.user.id = :userId
           and p.deleted = false
           and v.viewedAt = (

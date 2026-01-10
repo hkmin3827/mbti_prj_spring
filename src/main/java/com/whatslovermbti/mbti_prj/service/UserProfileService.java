@@ -3,7 +3,6 @@ package com.whatslovermbti.mbti_prj.service;
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
 import com.whatslovermbti.mbti_prj.dto.user.BasicProfileReq;
 import com.whatslovermbti.mbti_prj.dto.user.MbtiProfileReq;
-import com.whatslovermbti.mbti_prj.dto.user.ProfileReqDto;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.UserRepository;
@@ -20,7 +19,6 @@ public class UserProfileService {
     private final UserRepository userRepository;
 
     public void createBasicProfile(Long userId, BasicProfileReq dto){
-
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -59,7 +57,6 @@ public class UserProfileService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        // PATCH 병합 (null = 유지)
         String finalName =
                 dto.getName() != null ? dto.getName() : user.getName();
 
@@ -97,8 +94,8 @@ public class UserProfileService {
         MbtiValidator.validate(dto.getMbti());
 
         user.updateMbtiProfile(
-                dto.getMbti(),
-                dto.getPartnerMbti()
+                finalMbti,
+                finalPartnerMbti
         );
 
     }

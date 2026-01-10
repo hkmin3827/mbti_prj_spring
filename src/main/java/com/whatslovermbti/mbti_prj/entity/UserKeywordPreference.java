@@ -29,5 +29,5 @@ public class UserKeywordPreference {
     MbtiContext targetMbti;
 
     // 선호 점수 (-100 ~ +100 권장)
-    private int score;
+    private double score;
 }

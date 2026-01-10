@@ -1,8 +1,8 @@
 package com.whatslovermbti.mbti_prj.service.recommendation;
 
+import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.constant.PlaceSubCategory;
-import com.whatslovermbti.mbti_prj.dto.place.PlaceSnapshot;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoCategoryMapper;
 import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.annotation.Target;
 import java.util.*;
 
 // 유저에게 이 후보군 중 무엇을, 어떤 비율로 보여줄 것인가
@@ -35,6 +34,7 @@ public class PlaceRecommendationService {
     private final DocumentKeywordInferer keywordInferer;
     private final SubCategoryResolver subCategoryResolver;
     private final TargetMbtiResolver mbtiResolver;
+    private final UserPreferenceScoreApplier userPreferenceScoreApplier;
 
     // 핵심 추천 엔진 - 후보군은 확보 되어있고, score로 개인화 처리
     /*
@@ -51,10 +51,11 @@ public class PlaceRecommendationService {
         if (candidates == null || candidates.isEmpty()) {
             return List.of();
         }
+        Map<String, Double> combinedWeightMap =
+                keywordWeightAggregator.getCombinedKeywordWeightMapByName(user,  mbtiResolver.resolve(user, context));
 
-        // 키워드 기반 가중치 Map (String 키워드)
-        Map<String, Integer> keywordWeightMap =
-                keywordWeightAggregator.getCombinedKeywordWeightMapByName(user, mbtiResolver.resolve(user, context));
+        Map<String, Double> userPrefMap =
+                keywordWeightAggregator.getUserKeywordPreferenceMapByName(user);
 
 
         List<ScoredDoc> scored =
@@ -62,31 +63,37 @@ public class PlaceRecommendationService {
                         .map(doc -> {
                             Set<PlaceSubCategory> sub =
                                     subCategoryResolver.resolveFromCategoryName(doc.getCategoryName());
-
-                            PlaceSnapshot snapshot = PlaceSnapshot.from(doc);
+                            Category cate = KakaoCategoryMapper.resolveCategory(doc.getCategoryGroupCode());
 
                             List<String> inferred =
-                                    keywordInferer.infer(snapshot, sub);
+                                    keywordInferer.infer(sub, cate);
 
-                            int score =
+
+                            double baseScore =
                                     mbtiScoreCalculator.calculateDocumentScore(
-                                            KakaoCategoryMapper.resolveCategory(doc.getCategoryGroupCode()),
                                             inferred,
-                                            keywordWeightMap
+                                            combinedWeightMap
                                     );
 
-                            if (score > 0) {
+
+                            double userBonus =
+                                    userPreferenceScoreApplier.apply(userPrefMap, inferred);
+
+                            double score = baseScore + userBonus;
+
                                 log.info(
-                                        "[DOC_SCORE] placeName={}, keywords={}, score={}",
+                                        "[DOC_SCORE] placeName={}, sub={}, keywords={}, score={}",
                                         doc.getPlaceName(),
+                                        sub,
                                         inferred,
                                         score
                                 );
-                            }
 
                             return new ScoredDoc(doc, score, inferred);
                         })
+                        .sorted(Comparator.comparingDouble(ScoredDoc::score).reversed())
                         .toList();
+
 
         // RandomPicker에게 전부 위임
         List<KakaoMapResponse.Document> result =
@@ -110,6 +117,6 @@ public class PlaceRecommendationService {
 }
 record ScoredDoc(
         KakaoMapResponse.Document doc,
-        int score,
+        double score,
         List<String> keywords
 ) {}

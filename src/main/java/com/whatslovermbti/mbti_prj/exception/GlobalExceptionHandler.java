@@ -1,10 +1,13 @@
 package com.whatslovermbti.mbti_prj.exception;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.nio.file.AccessDeniedException;
 
 @RestControllerAdvice // (전역 예외 처리)
 public class GlobalExceptionHandler {
@@ -41,5 +44,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body("파일 용량이 너무 큽니다. (최대 10MB)");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(e.getMessage());
     }
 }

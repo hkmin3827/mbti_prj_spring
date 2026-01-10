@@ -65,7 +65,16 @@ public class SecurityConfig {
                 .exceptionHandling(ex ->
                         ex.authenticationEntryPoint(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
-                        )
+                        ).accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("""
+                            {
+                              "code": "ACCESS_DENIED",
+                              "message": "접근 권한이 없습니다."
+                            }
+                            """);
+                        })
                 )
 
                 .addFilterBefore(

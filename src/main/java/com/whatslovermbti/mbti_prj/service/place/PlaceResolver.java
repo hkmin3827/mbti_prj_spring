@@ -102,13 +102,14 @@
 
             Set<PlaceSubCategory> subCategories =
                     subCategoryResolver.resolveFromCategoryName(s.categoryName());
+            Category cate = KakaoCategoryMapper.resolveCategory(s.categoryGroupCode());
 
             List<String> inferredKeywords =
-                    documentKeywordInferer.infer(s, subCategories);
+                    documentKeywordInferer.infer(subCategories, cate);
 
-            placeKeywordMapper.mapKeywords(place, subCategories, inferredKeywords);
+            placeKeywordMapper.mapInitialKeywords(place, subCategories, inferredKeywords);
 
-            // 🔴 기존 place도 AI 보정 트리거
+            // 기존 place도 AI 보정 트리거
             eventPublisher.publishEvent(
                     new PlaceCreatedEvent(place.getId())
             );

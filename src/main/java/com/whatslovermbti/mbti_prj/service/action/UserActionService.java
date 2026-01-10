@@ -7,13 +7,17 @@ import com.whatslovermbti.mbti_prj.exception.CustomException;
 import com.whatslovermbti.mbti_prj.repository.*;
 import com.whatslovermbti.mbti_prj.service.place.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -143,35 +147,43 @@ public class UserActionService {
                 UserActionLog.of(user, place, actionType, context)
         );
 
-        int delta = ActionWeightPolicy.getWeight(actionType);
-
         List<PlaceKeyword> placeKeywords =
                 placeKeywordRepository.findByPlace(place);
 
         // 키워드가 없는 장소면 로그만 남기고 종료
         if (placeKeywords.isEmpty()) {
+            log.info("THERE's NO placeKeywords");
             return;
         }
+        double baseDelta = ActionWeightPolicy.getWeight(actionType);
+
+        List<UserKeywordPreference> prefs =
+                userKeywordPreferenceRepository.findByUserAndTargetMbti(user, context);
+        Map<Long, UserKeywordPreference> prefMap =
+                prefs.stream()
+                        .collect(Collectors.toMap(
+                                p -> p.getKeyword().getId(),
+                                p -> p
+                        ));
 
         for (PlaceKeyword pk : placeKeywords) {
-
             Keyword keyword = pk.getKeyword();
 
             UserKeywordPreference pref =
-                    userKeywordPreferenceRepository
-                            .findByUserAndKeywordAndTargetMbti(user, keyword, context)
-                            .orElseGet(() -> {
-                                UserKeywordPreference newPref = new UserKeywordPreference();
-                                newPref.setUser(user);
-                                newPref.setKeyword(keyword);
-                                newPref.setScore(0);
-                                newPref.setTargetMbti(context);
-                                return newPref;
-                            });
+                    prefMap.computeIfAbsent(keyword.getId(), k -> {
+                        UserKeywordPreference newPref = new UserKeywordPreference();
+                        newPref.setUser(user);
+                        newPref.setKeyword(keyword);
+                        newPref.setTargetMbti(context);
+                        newPref.setScore(0);
+                        return newPref;
+                    });
+
+            double finalDelta = baseDelta * pk.getWeight();
 
             // 안전하게 점수 누적
             pref.setScore(
-                    Math.max(-100, Math.min(100, pref.getScore() + delta))
+                    Math.max(-100, Math.min(100, pref.getScore() + finalDelta))
             );
 
             userKeywordPreferenceRepository.save(pref);

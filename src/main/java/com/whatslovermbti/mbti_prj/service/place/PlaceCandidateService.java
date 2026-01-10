@@ -16,11 +16,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class PlaceCandidateService {
-
     private final KakaoMapClient kakaoMapClient;
-
     private static final int TARGET_SIZE = 45;
-
 
     /**
      * 후보군 확보 + Place resolve (유일한 진입점)

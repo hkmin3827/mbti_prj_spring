@@ -37,7 +37,7 @@ public class ReviewQueryService {
 
         Pageable pageable = PageRequest.of(page, size, sortCondition);
 
-        return reviewRepository.findAll(pageable)
+        return reviewRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(review -> ReviewResponse.from(review));
     }
 
