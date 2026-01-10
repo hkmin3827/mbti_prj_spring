@@ -1,10 +1,13 @@
 package com.whatslovermbti.mbti_prj.repository;
 
+import com.whatslovermbti.mbti_prj.dto.place.PlaceReviewCountDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -18,4 +21,40 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByUserIdAndReceiptHash(Long userId, String receiptHash);
 
     void deleteByPlaceId(Long placeId);
+
+
+    Page<Review> findByPlaceIdOrderByCreatedAtDesc(Long placeId, Pageable pageable);
+
+    Page<Review> findByPlace_NameContainingIgnoreCaseOrderByCreatedAtDesc(
+            String placeName, Pageable pageable);
+
+
+
+    @Query("""
+    select new com.whatslovermbti.mbti_prj.dto.place.PlaceReviewCountDto(
+        p.id,
+        p.name,
+        p.category,
+        p.address,
+        p.roadAddress,
+        p.rating,
+        p.kakaoPlaceId,
+        p.telnum,
+        count(r)
+    )
+    from Review r
+    join r.place p
+    where p.deleted = false
+    group by
+        p.id,
+        p.name,
+        p.category,
+        p.address,
+        p.roadAddress,
+        p.rating,
+        p.kakaoPlaceId,
+        p.telnum
+    order by count(r) desc
+""")
+    List<PlaceReviewCountDto> findMostReviewedPlaces(Pageable pageable);
 }

@@ -30,8 +30,8 @@ public class UserController {
                 user.getTelnum(),
                 user.isProfileCompleted(),
                 user.isActive(),
-                user.getCreatedAt()
-
+                user.getCreatedAt(),
+                user.getRole()
         );
     }
 }

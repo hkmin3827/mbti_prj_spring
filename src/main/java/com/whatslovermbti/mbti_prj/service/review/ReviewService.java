@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.service.review;
 
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
+import com.whatslovermbti.mbti_prj.dto.place.PlaceDetailResponse;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
@@ -16,11 +17,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,12 @@ public class ReviewService {
     private final S3Service s3Service;
     private final PlaceMatcher placeMatcher;
 
+    public void increaseViewCount(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰가 존재하지 않습니다."));
+
+        review.setViewCount(review.getViewCount() + 1);
+    }
     public Review createReview(
             User user,
             Long placeId,
@@ -155,5 +164,4 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
-
 }

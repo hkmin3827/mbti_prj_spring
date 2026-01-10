@@ -4,6 +4,9 @@ import com.whatslovermbti.mbti_prj.annotation.LoginUser;
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.dto.place.PlaceResDto;
 import com.whatslovermbti.mbti_prj.dto.place.PlaceSnapshot;
+import com.whatslovermbti.mbti_prj.dto.place.PlaceViewCountDto;
+import com.whatslovermbti.mbti_prj.dto.place.PlaceViewResponse;
+import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import com.whatslovermbti.mbti_prj.service.action.UserActionQueryService;
@@ -25,21 +28,23 @@ class ViewController {
     private final UserActionQueryService userActionQueryService;
 
     @PostMapping("/place")
-    public void viewPlace(
+    public PlaceViewResponse viewPlace(
             @RequestBody PlaceSnapshot snapshot,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "SELF") MbtiContext context
     ) {
         User user = userDetails.getUser();
 
-        userActionService.onPlaceClicked(
+        Place place = userActionService.onPlaceClicked(
                 user,
                 snapshot,
                 context
         );
+
+        return new PlaceViewResponse(place.getId());
     }
 
-    @GetMapping
+    @GetMapping("/me")
     public List<PlaceResDto> myViews(
             @LoginUser Long userId
     ) {
@@ -58,4 +63,12 @@ class ViewController {
         return ResponseEntity.noContent().build(); // 204
     }
 
+    @GetMapping("/most-viewed")
+    public List<PlaceViewCountDto> getMostViewedPlaces(
+            @RequestParam String mbti,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return userActionQueryService
+                .getMostViewedPlacesByMbti(mbti, limit);
+    }
 }

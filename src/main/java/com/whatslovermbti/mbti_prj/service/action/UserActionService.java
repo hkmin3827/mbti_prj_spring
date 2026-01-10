@@ -29,9 +29,12 @@ public class UserActionService {
 
 
     // VIEW 행동 진입점
-    public void onPlaceClicked(User user, PlaceSnapshot snapshot, MbtiContext context) {
-        Place place = placeResolver.resolve(snapshot);
+    public Place onPlaceClicked(User user, PlaceSnapshot snapshot, MbtiContext context) {
+        Place place = placeResolver.resolveAndEnsureKeywords(snapshot);
         recordView(user.getId(), place.getId(), context);
+
+
+        return place;
     }
 
     public void bookmarkPlace(Long userId, Long placeId, MbtiContext context) {
@@ -53,7 +56,7 @@ public class UserActionService {
         applyUserAction(user, place, ActionType.SAVE, context);
     }
 
-    public void removeBookmark(Long userId, Long placeId, MbtiContext context) {
+    public void removeBookmark(Long userId, Long placeId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -61,14 +64,14 @@ public class UserActionService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
 
         PlaceBookmark bookmark =
-                placeBookmarkRepository.findByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)
+                placeBookmarkRepository.findByUserIdAndPlaceId(userId, placeId)
                         .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
 
         // 북마크 삭제
         placeBookmarkRepository.delete(bookmark);
 
         // 가중치 되돌리기
-        applyUserAction(user, place, ActionType.UNSAVE, context);
+        applyUserAction(user, place, ActionType.UNSAVE, bookmark.getTargetMbti());
     }
 
 
@@ -88,13 +91,14 @@ public class UserActionService {
                         .existsByUserAndPlaceAndTargetMbtiAndViewedAtBetween(
                                 user, place, context, startOfDay, endOfDay
                         );
+        PlaceViewHistory history =
+                placeViewHistoryRepository
+                        .findByUserAndPlaceAndTargetMbti(user, place, context)
+                        .orElseGet(() -> new PlaceViewHistory(user, place, context));
 
-        // 해당 장소 그 전에 본기록 있으면 삭제
-        placeViewHistoryRepository.deleteByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context);
+        history.updateViewedAt();
 
-        placeViewHistoryRepository.save(
-                new PlaceViewHistory(user, place, context)
-        );
+        placeViewHistoryRepository.save(history);
 
         // 최근 20개 유지
         List<Long> ids =

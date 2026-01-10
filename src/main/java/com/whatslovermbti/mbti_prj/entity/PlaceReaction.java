@@ -41,9 +41,10 @@ public class PlaceReaction {
         this.user = user;
         this.place = place;
         this.type = type;
+        this.targetMbti = targetMbti;
     }
     @Enumerated(EnumType.STRING)
-    MbtiContext targetMbti;
+    private MbtiContext targetMbti;
 
     @PrePersist
     void onCreate() {

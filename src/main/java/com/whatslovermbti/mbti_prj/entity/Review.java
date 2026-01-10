@@ -43,6 +43,8 @@ public class Review {
 
     private Integer placeMatchScore;
 
+    private long viewCount = 0;
+
     private LocalDateTime createdAt;
     @PrePersist
     public void onCreate() {

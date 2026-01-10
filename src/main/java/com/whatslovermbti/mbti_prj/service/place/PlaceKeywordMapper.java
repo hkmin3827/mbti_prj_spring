@@ -34,6 +34,24 @@ public class PlaceKeywordMapper {
         /* ================= 공통 ================= */
         add(keywordWeights, "데이트", 1);
 
+        /* ================= CATEGORY 기본 ================= */
+
+        switch (place.getCategory()) {
+            case CAFE -> {
+                add(keywordWeights, "감성적인", 2);
+                add(keywordWeights, "조용한", 1);
+                add(keywordWeights, "자유로운", 1);
+            }
+            case FOOD -> {
+                add(keywordWeights, "계획적인", 1);
+                add(keywordWeights, "분위기좋은", 1);
+            }
+            case COURSE -> {
+                add(keywordWeights, "데이트", 2);
+                add(keywordWeights, "자유로운", 2);
+            }
+        }
+
         /* ================= SubCategory 기반 보정 ================= */
 
         if (hasAny(subCategories,

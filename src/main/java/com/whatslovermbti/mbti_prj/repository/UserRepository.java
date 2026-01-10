@@ -18,8 +18,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long Id);
 
+
+
     // 회원 전체 조회
     Page<User> findAll(Pageable pageable);
     // 활성/ 비활성 회원 전체 조회
     Page<User> findByIsActive(boolean isActive, Pageable pageable);
+
+    Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Page<User> findByIsActiveAndNameContainingIgnoreCase(
+            boolean isActive, String name, Pageable pageable);
 }

@@ -1,15 +1,18 @@
 package com.whatslovermbti.mbti_prj.repository;
 
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
+import com.whatslovermbti.mbti_prj.dto.place.PlaceViewCountDto;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.PlaceViewHistory;
 import com.whatslovermbti.mbti_prj.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHistory, Long> {
     // VIEW 가중치 반영은 하루에 1회 조회된 것으로만 계산
@@ -20,16 +23,6 @@ public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHisto
             LocalDateTime start,
             LocalDateTime end
     );
-
-    // 같은 장소에 대한 기존 조회 기록 전부 삭제
-    @Modifying
-    @Query("""
-        delete from PlaceViewHistory v
-        where v.user.id = :userId
-          and v.place.id = :placeId
-          and v.targetMbti = :targetMbti
-    """)
-    void deleteByUserIdAndPlaceIdAndTargetMbti(Long userId, Long placeId, MbtiContext targetMbti);
 
     // 최근 조회한 장소들 (최신순)
     @Query("""
@@ -79,4 +72,11 @@ public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHisto
           and v.place.id = :placeId
     """)
     void deleteByUserIdAndPlaceId(Long userId, Long placeId);
+
+    Optional<PlaceViewHistory> findByUserAndPlaceAndTargetMbti(
+            User user,
+            Place place,
+            MbtiContext targetMbti
+    );
+
 }

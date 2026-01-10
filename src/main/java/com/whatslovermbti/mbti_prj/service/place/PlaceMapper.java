@@ -62,7 +62,6 @@ public class PlaceMapper {
         try {
             return objectMapper.readValue(imagesJson, new TypeReference<List<String>>() {});
         } catch (Exception e) {
-            // TODO: 로그 남기고 빈 리스트 반환(안전)
             return List.of();
         }
     }

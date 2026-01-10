@@ -35,13 +35,11 @@ public class BookmarkController {
     @DeleteMapping("/places/{placeId}")
     public void unsaveBookmark(
             @PathVariable Long placeId,
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam(defaultValue = "SELF") MbtiContext context
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         User user = userDetails.getUser();
 
-
-        userActionService.removeBookmark(user.getId(), placeId, context);
+        userActionService.removeBookmark(user.getId(), placeId);
     }
 
     @GetMapping

@@ -1,5 +1,7 @@
 package com.whatslovermbti.mbti_prj.controller;
 
+import com.whatslovermbti.mbti_prj.constant.Category;
+import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.service.AdminService;
@@ -18,8 +20,14 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/users")
-    public ResponseEntity<Page<User>> getAllUsers(Pageable pageable) {
-        return ResponseEntity.ok(adminService.getAllUsers(pageable));
+    public ResponseEntity<Page<User>> getUsers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Boolean active,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                adminService.getUsers(keyword, active, pageable)
+        );
     }
 
     // 활성 회원 조회
@@ -47,10 +55,15 @@ public class AdminController {
         adminService.deactivateUser(userId);
         return ResponseEntity.noContent().build();
     }
-    // 리뷰 전체 조회 (최신순)
+
     @GetMapping("/reviews")
-    public ResponseEntity<Page<Review>> getAllReviews(Pageable pageable) {
-        return ResponseEntity.ok(adminService.getAllReviewsLatest(pageable));
+    public ResponseEntity<Page<Review>> getReviews(
+            @RequestParam(required = false) String placeName,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                adminService.getReviews(placeName, pageable)
+        );
     }
 
     // 리뷰 삭제
@@ -60,6 +73,16 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/places")
+    public ResponseEntity<Page<Place>> getPlaces(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Category category,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                adminService.getPlaces(keyword, category, pageable)
+        );
+    }
     @PatchMapping("/{placeId}/soft-delete")
     public ResponseEntity<Void> softDeletePlace(
             @PathVariable Long placeId

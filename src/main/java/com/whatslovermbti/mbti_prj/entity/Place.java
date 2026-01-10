@@ -38,6 +38,7 @@ public class Place {
     private String description;
 
     private String kakaoPlaceId;   // 카카오 PlaceId
+    private String telnum;
 
     // 중간 연결 엔티티
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)

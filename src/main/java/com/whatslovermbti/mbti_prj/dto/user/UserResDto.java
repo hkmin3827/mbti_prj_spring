@@ -1,6 +1,7 @@
 package com.whatslovermbti.mbti_prj.dto.user;
 
 import com.whatslovermbti.mbti_prj.constant.Provider;
+import com.whatslovermbti.mbti_prj.constant.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,5 @@ public class UserResDto {
     private Boolean profileCompleted;
     private Boolean isActive;
     private LocalDateTime createdAt;
+    private Role role;
 }

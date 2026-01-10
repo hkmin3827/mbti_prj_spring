@@ -14,18 +14,25 @@ public class KakaoCategoryMapper {
             );
         };
     }
-    /**
-     * 카카오 category_name (예: "음식점 > 한식 > 백반,가정식")
-     * → 우리 서비스 Category로 변환 (결과 분류용)
-     */
+
     public static Category resolveCategory(String kakaoCategoryCode) {
-
-        KakaoCategoryCode code = KakaoCategoryCode.from(kakaoCategoryCode);
-
-        if (code == null) {
+        if (kakaoCategoryCode == null) {
             return Category.COURSE;
         }
+        return switch (kakaoCategoryCode) {
+            case "FD6" -> Category.FOOD;
+            case "CE7" -> Category.CAFE;
+            default -> Category.COURSE; // AT4, CT1, LEI 등
+        };
+    }
 
-        return code.getCategory();
+    public static Category resolveFromCategoryName(String categoryName) {
+        if (categoryName == null) return Category.COURSE;
+
+        if (categoryName.contains("카페")) return Category.CAFE;
+        if (categoryName.contains("커피")) return Category.CAFE;
+        if (categoryName.contains("음식")) return Category.FOOD;
+
+        return Category.COURSE;
     }
 }

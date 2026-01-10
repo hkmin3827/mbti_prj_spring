@@ -64,12 +64,13 @@ public class PlaceRecommendationService {
                                     subCategoryResolver.resolveFromCategoryName(doc.getCategoryName());
 
                             PlaceSnapshot snapshot = PlaceSnapshot.from(doc);
+
                             List<String> inferred =
                                     keywordInferer.infer(snapshot, sub);
 
                             int score =
                                     mbtiScoreCalculator.calculateDocumentScore(
-                                            KakaoCategoryMapper.resolveCategory(doc.getCategoryName()),
+                                            KakaoCategoryMapper.resolveCategory(doc.getCategoryGroupCode()),
                                             inferred,
                                             keywordWeightMap
                                     );

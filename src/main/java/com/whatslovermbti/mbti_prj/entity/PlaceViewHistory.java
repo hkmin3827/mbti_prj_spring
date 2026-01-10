@@ -40,8 +40,13 @@ public class PlaceViewHistory {
         this.user = user;
         this.place = place;
         this.targetMbti = targetMbti;
+        this.viewedAt = LocalDateTime.now();
     }
 
     @Enumerated(EnumType.STRING)
     MbtiContext targetMbti;
+
+    public void updateViewedAt() {
+        this.viewedAt = LocalDateTime.now();
+    }
 }

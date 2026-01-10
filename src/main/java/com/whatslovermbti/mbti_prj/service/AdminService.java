@@ -1,5 +1,6 @@
 package com.whatslovermbti.mbti_prj.service;
 
+import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.constant.ErrorCode;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.Review;
@@ -30,8 +31,27 @@ public class AdminService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+
+    @Transactional(readOnly = true)
+    public Page<User> getUsers(String keyword, Boolean active, Pageable pageable) {
+
+        boolean hasKeyword = keyword != null && keyword.trim().length() >= 2;
+
+        if (!hasKeyword && active == null) {
+            return userRepository.findAll(pageable); // 기본 전체 조회
+        }
+
+        if (hasKeyword && active == null) {
+            return userRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        }
+
+        if (!hasKeyword) {
+            return userRepository.findByIsActive(active, pageable);
+        }
+
+        return userRepository.findByIsActiveAndNameContainingIgnoreCase(
+                active, keyword, pageable
+        );
     }
 
     @Transactional(readOnly = true)
@@ -61,9 +81,21 @@ public class AdminService {
         user.deactivate();
     }
 
+    @Transactional(readOnly = true)
+    public Page<Review> getReviews(String placeName, Pageable pageable) {
 
-    public Page<Review> getAllReviewsLatest(Pageable pageable) {
-        return reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+        boolean hasPlaceName =
+                placeName != null && placeName.trim().length() >= 2;
+
+        // 기본: 전체 리뷰 (최신순)
+        if (!hasPlaceName) {
+            return reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+
+        // Place 이름으로 필터
+        return reviewRepository
+                .findByPlace_NameContainingIgnoreCaseOrderByCreatedAtDesc(
+                        placeName, pageable);
     }
 
     public void deleteReview(Long reviewId) {
@@ -71,6 +103,36 @@ public class AdminService {
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
         reviewRepository.delete(review);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Place> getPlaces(
+            String keyword,
+            Category category,
+            Pageable pageable
+    ) {
+
+        boolean hasKeyword = keyword != null && keyword.trim().length() >= 2;
+
+        // 전체 조회 (기본)
+        if (!hasKeyword && category == null) {
+            return placeRepository.findAll(pageable);
+        }
+
+        // 카테고리만 필터
+        if (!hasKeyword) {
+            return placeRepository.findByCategory(category, pageable);
+        }
+
+        // 검색만
+        if (category == null) {
+            return placeRepository.findByNameContainingIgnoreCase(
+                    keyword, pageable);
+        }
+
+        // 검색 + 카테고리
+        return placeRepository.findByCategoryAndNameContainingIgnoreCase(
+                category, keyword, pageable);
     }
 
     @Transactional
@@ -102,4 +164,6 @@ public class AdminService {
         // Place 자체 삭제
         placeRepository.delete(place);
     }
+
+
 }

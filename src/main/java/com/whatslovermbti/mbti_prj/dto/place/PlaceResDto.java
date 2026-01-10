@@ -30,11 +30,14 @@ public class PlaceResDto {
     private Double distance;   // km (계산값)
 
 
-    // mbtiContext별 저장 상태 (선택)
-    private Set<MbtiContext> savedContexts;
-    public void setSavedContexts(Set<MbtiContext> savedContexts) {
-        this.savedContexts = savedContexts;
+    // mbtiContext별 저장 상태 (좋아요)
+    private Set<MbtiContext> likedContexts = Set.of();
+    public void setLikedContexts(Set<MbtiContext> likedContexts) {
+        this.likedContexts = likedContexts;
     }
+
+    private MbtiContext bookmarkedContext;
+    public void setBookmarkedContext(MbtiContext bookmarkedContext) {this.bookmarkedContext = bookmarkedContext;}
 
     // 내부 공용 생성자
     private PlaceResDto(

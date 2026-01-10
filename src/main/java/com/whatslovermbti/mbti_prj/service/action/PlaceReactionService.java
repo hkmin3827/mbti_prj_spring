@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.*;
 import java.time.LocalDateTime;
 
 @Service
@@ -74,12 +75,15 @@ public class PlaceReactionService {
                 });
     }
 
-    // 마이페이지에서 좋아요 취소
-    public void removeLike(
+    public void removeReaction(
             Long userId,
             Long placeId,
+            ActionType type,
             MbtiContext context
     ) {
+        if (type != ActionType.LIKE && type != ActionType.DISLIKE) {
+            throw new IllegalArgumentException("Invalid reaction type: " + type);
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -88,11 +92,16 @@ public class PlaceReactionService {
 
         PlaceReaction reaction =
                 placeReactionRepository
-                        .findByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)
+                        .findByUserIdAndPlaceIdAndTargetMbtiAndType(
+                                userId,
+                                placeId,
+                                context,
+                                type
+                        )
                         .orElseThrow(() -> new CustomException(ErrorCode.REACTION_NOT_FOUND));
 
-        if (reaction.getType() != ActionType.LIKE) {
-            return; // 이미 LIKE 아님 → 무시
+        if (reaction.getType() != type) {
+            return;
         }
 
         // reacton 삭제
@@ -102,7 +111,7 @@ public class PlaceReactionService {
         userActionService.applyUserAction(
                 user,
                 place,
-                ActionType.DISLIKE,
+                invert(type),
                 context
         );
     }

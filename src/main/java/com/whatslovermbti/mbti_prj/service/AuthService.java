@@ -77,20 +77,8 @@ public class AuthService {
 
     @Transactional
     public void withdraw(User user, WithdrawReqDto dto) {
-
-        if (!userRepository.existsById(user.getId())) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        // LOCAL 계정 → 비밀번호 검증
-        if (user.getProvider() == Provider.LOCAL) {
-            if (dto == null || dto.getPassword() == null) {
-                throw new CustomException(ErrorCode.PASSWORD_REQUIRED);
-            }
-
-            if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-                throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
-            }
+        if (dto == null || !"탈퇴합니다".equals(dto.getConfirmText())) {
+            throw new IllegalArgumentException("탈퇴 확인 문구가 올바르지 않습니다.");
         }
 
         // 카카오면 제공자랑 계정 연결까지 해제

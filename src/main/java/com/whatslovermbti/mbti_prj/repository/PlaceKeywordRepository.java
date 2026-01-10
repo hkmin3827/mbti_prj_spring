@@ -11,5 +11,6 @@ public interface PlaceKeywordRepository extends JpaRepository<PlaceKeyword, Long
     List<PlaceKeyword> findByPlace(Place place);
     boolean existsByPlaceAndKeyword(Place place, Keyword keyword);
 
+    boolean existsByPlaceId(Long placeId);
     void deleteByPlaceId(Long placeId);
 }

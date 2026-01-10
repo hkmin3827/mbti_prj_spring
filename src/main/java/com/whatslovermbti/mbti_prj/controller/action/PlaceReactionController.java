@@ -34,22 +34,24 @@ public class PlaceReactionController {
         placeReactionService.react(user.getId(), placeId, type, context);
     }
 
-    @DeleteMapping("/{placeId}")
-    public ResponseEntity<Void> removeLike(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+    @DeleteMapping("/places/{placeId}")
+    public ResponseEntity<Void> removeReaction(
             @PathVariable Long placeId,
-            @RequestParam MbtiContext context
+            @RequestParam ActionType type,
+            @RequestParam(defaultValue = "SELF") MbtiContext context,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        placeReactionService.removeLike(
+        placeReactionService.removeReaction(
                 userDetails.getUser().getId(),
                 placeId,
+                type,
                 context
         );
-        return ResponseEntity.noContent().build(); // 204
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public List<PlaceResDto> myReactions(
+    public List<PlaceResDto> myLikedPlaces(
             @LoginUser Long userId
     ) {
         return userActionQueryService.getLikedPlaces(userId);
