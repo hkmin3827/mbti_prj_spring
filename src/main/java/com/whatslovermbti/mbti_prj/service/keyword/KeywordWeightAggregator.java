@@ -85,36 +85,4 @@ public class KeywordWeightAggregator {
 
         return result;
     }
-
-
-    // MBTI 기준 키워드 기본 가중치 Map (ID 기준)
-    public Map<Long, Integer> getMbtiKeywordWeightMapById(String mbti) {
-
-        Set<MbtiAxis> axes =
-                MbtiAxisUtil.parseAxes(mbti)
-                        .keySet()
-                        .stream()
-                        .map(MbtiAxis::valueOf)
-                        .collect(Collectors.toSet());
-
-        List<MbtiKeywordWeight> weights =
-                mbtiKeywordWeightRepository.findAllByAxes(axes);
-
-        return weights.stream()
-                .collect(Collectors.groupingBy(
-                        w -> w.getKeyword().getId(),
-                        Collectors.summingInt(MbtiKeywordWeight::getWeight)
-                ));
-    }
-
-    // 유저 행동 기반 선호 Map (ID 기준)
-    public Map<Long, Double> getUserKeywordPreferenceMapById(User user) {
-
-        return userKeywordPreferenceRepository.findAllByUser(user).stream()
-                .collect(Collectors.toMap(
-                        p -> p.getKeyword().getId(),
-                        UserKeywordPreference::getScore,
-                        Double::sum
-                ));
-    }
 }
