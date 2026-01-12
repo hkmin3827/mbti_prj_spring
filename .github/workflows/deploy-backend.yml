@@ -2,7 +2,8 @@ name: Deploy Backend to EC2
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
 
 jobs:
   deploy:
