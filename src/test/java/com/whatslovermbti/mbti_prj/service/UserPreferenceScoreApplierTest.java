@@ -13,7 +13,7 @@ class UserPreferenceScoreApplierTest {
     private final UserPreferenceScoreApplier applier =
             new UserPreferenceScoreApplier();
 
-    
+
     @Test
     void 유저_선호_키워드가_장소_키워드와_겹치면_보너스가_부여된다() {
         // given
