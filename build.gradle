@@ -67,6 +67,9 @@ dependencies {
 
 	// GEMINI
 	implementation("com.google.genai:google-genai:1.8.0")
+
+	// AWS 파라미터 스토어
+	implementation "io.awspring.cloud:spring-cloud-aws-starter-parameter-store"
 }
 tasks.named('test') {
 	useJUnitPlatform()
