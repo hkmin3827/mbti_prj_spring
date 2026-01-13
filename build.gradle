@@ -52,8 +52,14 @@ dependencies {
 	implementation platform('com.google.cloud:libraries-bom:26.49.0')
 	implementation 'com.google.cloud:google-cloud-vision'
 
-	// AWS S3 버킷
-	implementation 'software.amazon.awssdk:s3:2.20.0'
+	// ✅ AWS SDK BOM (버전 통일)
+	implementation platform("software.amazon.awssdk:bom:2.25.40")
+
+	// ✅ S3 (버전 명시 X)
+	implementation "software.amazon.awssdk:s3"
+
+	// AWS 파라미터 스토어
+	implementation "io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1"
 
 	// oauth2
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -67,9 +73,6 @@ dependencies {
 
 	// GEMINI
 	implementation("com.google.genai:google-genai:1.8.0")
-
-	// AWS 파라미터 스토어
-	implementation "io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.1.1"
 }
 tasks.named('test') {
 	useJUnitPlatform()
