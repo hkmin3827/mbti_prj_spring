@@ -99,3 +99,7 @@ gemini:
     name: gemini-2.5-flash
     temperature: 0.4
     max-output-tokens: 512
+
+app:
+  frontend:
+    base-url: ${FRONT_BASE_URL}
