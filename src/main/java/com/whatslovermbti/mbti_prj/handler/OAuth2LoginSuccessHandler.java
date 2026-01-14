@@ -44,7 +44,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         // userId 기준 JWT 발급
         String token = jwtProvider.createToken(user.getId());
         String redirectUrl =
-                "http://localhost:5173/oauth/callback?token=" + token;
+                "https://lovers-mbti.vercel.app/oauth/callback?token=" + token;
 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 
