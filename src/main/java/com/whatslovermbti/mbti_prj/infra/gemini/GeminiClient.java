@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +61,13 @@ public class GeminiClient {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String.class)
+                .retryWhen(
+                        Retry.backoff(1, Duration.ofMillis(300))
+                                .filter(e ->
+                                        e instanceof WebClientResponseException.TooManyRequests ||
+                                                e instanceof WebClientResponseException.ServiceUnavailable
+                                )
+                )
                 .doOnSuccess(r -> log.info("[Gemini] request success"))
                 .doOnError(e -> log.error("[Gemini] request failed", e))
                 .block();
