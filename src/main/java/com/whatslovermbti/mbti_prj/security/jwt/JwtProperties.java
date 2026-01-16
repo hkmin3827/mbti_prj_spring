@@ -11,5 +11,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class JwtProperties {
     private String secret;
+    
+    // 유효 시간 : 1일
     private long expiration;
 }
