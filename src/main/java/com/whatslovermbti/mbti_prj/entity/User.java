@@ -59,6 +59,12 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    private LocalDateTime lastLogoutAt;
+
+    // JWT 탈취 최소 방어
+    public void logout() {
+        this.lastLogoutAt = LocalDateTime.now();
+    }
 
     public void updateBasicProfile(String name, String profileImage, String telnum) {
         this.name =name;

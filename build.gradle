@@ -52,10 +52,10 @@ dependencies {
 	implementation platform('com.google.cloud:libraries-bom:26.49.0')
 	implementation 'com.google.cloud:google-cloud-vision'
 
-	// ✅ AWS SDK BOM (버전 통일)
+	// AWS SDK BOM (버전 통일)
 	implementation platform("software.amazon.awssdk:bom:2.25.40")
 
-	// ✅ S3 (버전 명시 X)
+	// S3 (버전 명시 X)
 	implementation "software.amazon.awssdk:s3"
 
 	// AWS 파라미터 스토어

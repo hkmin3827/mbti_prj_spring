@@ -1,10 +1,14 @@
 package com.whatslovermbti.mbti_prj.controller;
 
+import com.whatslovermbti.mbti_prj.annotation.LoginUser;
+import com.whatslovermbti.mbti_prj.constant.ErrorCode;
 import com.whatslovermbti.mbti_prj.dto.auth.LoginReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.SignUpReqDto;
 import com.whatslovermbti.mbti_prj.dto.auth.TokenResDto;
 import com.whatslovermbti.mbti_prj.dto.auth.WithdrawReqDto;
 import com.whatslovermbti.mbti_prj.entity.User;
+import com.whatslovermbti.mbti_prj.exception.CustomException;
+import com.whatslovermbti.mbti_prj.repository.UserRepository;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import com.whatslovermbti.mbti_prj.security.jwt.JwtProvider;
 import com.whatslovermbti.mbti_prj.service.AuthService;
@@ -24,6 +28,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpReqDto dto) {
@@ -40,6 +45,19 @@ public class AuthController {
 
         return ResponseEntity.ok(new TokenResDto(token, user.isProfileCompleted()));
 
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @LoginUser Long userId
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.logout();
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/withdraw")

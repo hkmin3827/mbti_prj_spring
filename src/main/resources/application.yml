@@ -79,6 +79,7 @@ server:
 
 jwt:
   secret: ${jwt.secret}
+  expiration: 1000*60*60*24
 
 kakao:
   admin-key: ${kakao.admin-key}
