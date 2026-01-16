@@ -33,7 +33,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/auth/signup",
+                                "/auth/login",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
                                 "/test/places/**",
@@ -51,7 +52,9 @@ public class SecurityConfig {
                                 "/api/test/ocr/**",
                                 "/api/s3/**",
                                 "/api/reviews/**",
-                                "/api/profile/**"
+                                "/api/profile/**",
+                                "/auth/logout",
+                                "/auth/withdraw"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
