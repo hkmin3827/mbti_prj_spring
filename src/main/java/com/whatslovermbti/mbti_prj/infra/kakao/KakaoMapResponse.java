@@ -79,11 +79,9 @@ public class KakaoMapResponse {
         @JsonProperty("road_address_name")
         private String roadAddressName;
 
-        // longitude
         @JsonProperty("x")
         private String longitude;
 
-        // latitude
         @JsonProperty("y")
         private String latitude;
 

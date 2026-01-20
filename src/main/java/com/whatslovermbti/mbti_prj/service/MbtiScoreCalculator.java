@@ -8,7 +8,6 @@ import java.util.Map;
 @Service
 @Transactional(readOnly = true)
 public class MbtiScoreCalculator {
-
     public double calculateDocumentScore(
             List<String> inferredKeywords,
             Map<String, Double> keywordWeightMap

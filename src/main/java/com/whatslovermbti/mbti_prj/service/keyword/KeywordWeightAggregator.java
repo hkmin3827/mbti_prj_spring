@@ -34,7 +34,6 @@ public class KeywordWeightAggregator {
                         .map(MbtiAxis::valueOf)
                         .collect(Collectors.toSet());
 
-        // ^^^^엠비티아이별로 바뀌는지 확인 로그
         log.info("[MBTI_AXES] mbti={}, axes={}", mbti, axes);
 
         List<MbtiKeywordWeight> weights =
@@ -67,7 +66,6 @@ public class KeywordWeightAggregator {
 
     // 통합 키워드 점수 Map : 키워드 이름 기준
     // Mbti 기본 가중치 + 유저 행동 가중치
-    // 희석 정책/ MbtiScoreCalculator 확장 필요
     public Map<String, Double> getCombinedKeywordWeightMapByName(
             User user,
             String targetMbti
@@ -80,7 +78,6 @@ public class KeywordWeightAggregator {
         mbtiWeights.forEach((k, v) -> result.merge(k,  v.doubleValue(), Double::sum));
         userPrefWeights.forEach((k, v) -> result.merge(k, v, Double::sum));
 
-        // 0 제거(선택)
         result.entrySet().removeIf(e -> Math.abs(e.getValue()) < 0.0001);
 
         return result;

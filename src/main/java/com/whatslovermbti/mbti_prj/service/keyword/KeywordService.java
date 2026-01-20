@@ -68,17 +68,11 @@ public class KeywordService {
         return keyword;
     }
 
-    /**
-     * 키워드 전체 조회 (프론트 선택용)
-     */
     @Transactional(readOnly = true)
     public List<Keyword> getAllKeywords() {
         return keywordRepository.findAll();
     }
 
-    /**
-     * 이름으로 키워드 조회 (없으면 예외)
-     */
     @Transactional(readOnly = true)
     public Keyword getByName(String name) {
         return keywordRepository.findByName(name.trim().toLowerCase())
@@ -87,7 +81,7 @@ public class KeywordService {
 
     /**
      * 장소 등록 시: 표준 키워드 조회
-     * 없으면 예외 (자동 생성 ❌)
+     * 없으면 예외 (자동 생성 x)
      */
     public Keyword getOrThrow(String name) {
 

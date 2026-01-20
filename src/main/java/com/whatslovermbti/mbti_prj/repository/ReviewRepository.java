@@ -27,7 +27,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     """)
     Page<Review> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-    // 영수증 중복 사용 여부
+    // 영수증 해시
     boolean existsByUserIdAndReceiptHash(Long userId, String receiptHash);
 
     void deleteByPlaceId(Long placeId);

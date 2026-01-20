@@ -114,7 +114,7 @@
                     new PlaceCreatedEvent(place.getId())
             );
         }
-        // 커밋이 끝난 뒤 Spring이 자동 호출
+
         @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
         public void handlePlaceCreated(PlaceCreatedEvent event) {
             try {
@@ -128,7 +128,6 @@
 
         @Transactional(propagation = REQUIRES_NEW)
         public void adjustKeywordsByAI(Place place) {
-
             // 보정 전 값 스냅샷
             Map<String, Integer> before =
                     place.getPlaceKeywords().stream()

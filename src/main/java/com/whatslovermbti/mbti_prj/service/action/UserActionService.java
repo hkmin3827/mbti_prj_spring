@@ -31,8 +31,6 @@ public class UserActionService {
     private final PlaceResolver placeResolver;
     private final UserActionLogRepository userActionLogRepository;
 
-
-    // VIEW 행동 진입점
     public Place onPlaceClicked(User user, PlaceSnapshot snapshot, MbtiContext context) {
         Place place = placeResolver.resolveAndEnsureKeywords(snapshot);
         recordView(user.getId(), place.getId(), context);
@@ -50,7 +48,7 @@ public class UserActionService {
 
 
         if (placeBookmarkRepository.existsByUserIdAndPlaceIdAndTargetMbti(userId, placeId, context)) {
-            return; // 이미 저장됨 → 무시 or 예외
+            return;
         }
 
         placeBookmarkRepository.save(
@@ -71,10 +69,8 @@ public class UserActionService {
                 placeBookmarkRepository.findByUserIdAndPlaceId(userId, placeId)
                         .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
 
-        // 북마크 삭제
         placeBookmarkRepository.delete(bookmark);
 
-        // 가중치 되돌리기
         applyUserAction(user, place, ActionType.UNSAVE, bookmark.getTargetMbti());
     }
 
@@ -150,7 +146,6 @@ public class UserActionService {
         List<PlaceKeyword> placeKeywords =
                 placeKeywordRepository.findByPlace(place);
 
-        // 키워드가 없는 장소면 로그만 남기고 종료
         if (placeKeywords.isEmpty()) {
             log.info("THERE's NO placeKeywords");
             return;

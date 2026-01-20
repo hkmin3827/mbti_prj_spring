@@ -12,10 +12,8 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class PlaceKeywordAdjustmentCalculator {
-    /** AI 키워드 1개당 기본 보정치 */
     // AI가 주는 raw Keyword가 중복으로 정규화시 동일 키워드가 되면 1번만 반영
     private static final int ATMOSPHERE_BOOST = 2;
-
     private final KeywordNormalizationService normalizationService;
 
     /**
@@ -33,7 +31,6 @@ public class PlaceKeywordAdjustmentCalculator {
             try {
                 standard = normalizationService.normalize(rawKeyword);
             } catch (Exception e) {
-                // 등록 안 된 키워드는 스킵
                 continue;
             }
 

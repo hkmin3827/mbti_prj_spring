@@ -39,13 +39,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> attributes = oauth2User.getAttributes();
 
-        // Provider 판별 + OAuthUserInfo 생성
         OAuthUserInfo oAuthUserInfo = resolveOAuthUserInfo(attributes);
 
-        // 이미 검증된 OAuth 정보로 User 생성 or 조회
         User user = authService.signupOrLoginOAuth(oAuthUserInfo);
 
-        // userId 기준 JWT 발급
         String token = jwtProvider.createToken(user.getId());
         String redirectUrl =
                 frontBaseUrl + "/oauth/callback?token=" + token;

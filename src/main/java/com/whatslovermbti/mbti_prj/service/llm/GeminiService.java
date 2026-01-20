@@ -14,9 +14,6 @@ public class GeminiService {
 
     private final GeminiClient geminiClient;
 
-    /**
-     * 장소 분위기 분석 (텍스트 생성)
-     */
     public PlaceAtmosphereResult analyzePlaceAtmosphere(
             String placeName,
             String address,

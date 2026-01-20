@@ -27,9 +27,8 @@ public class RandomPicker {
 
         int highCount   = (int) Math.round(pickCount * 0.4); // 40%
         int middleCount = (int) Math.round(pickCount * 0.4); // 40%
-        int lowCount    = pickCount - highCount - middleCount; // 나머지
+        int lowCount    = pickCount - highCount - middleCount;  // 20%
 
-        // ===== 구간 계산 =====
         int highEnd   = Math.min(total / 3, total);
         int middleEnd = Math.min(highEnd + total / 3, total);
 
@@ -40,7 +39,7 @@ public class RandomPicker {
         List<T> low =
                 new ArrayList<>(sortedByScore.subList(middleEnd, total));
 
-        // 핵심: 그룹 내부 셔플
+        // 그룹 내부도 셔플
         Collections.shuffle(high, random);
         Collections.shuffle(middle, random);
         Collections.shuffle(low, random);
@@ -59,7 +58,7 @@ public class RandomPicker {
                 .limit(lowCount)
                 .toList());
 
-        Collections.shuffle(result, random); // 최종 노출 섞기
+        Collections.shuffle(result, random);
 
         return result;
     }
