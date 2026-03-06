@@ -22,7 +22,7 @@ public class CacheConfig {
                         "kakaoCandidateCache",
                         Caffeine.newBuilder()
                                 .expireAfterWrite(6, TimeUnit.HOURS) // TTL
-                                .maximumSize(10_000)
+                                .maximumSize(200)
                                 .build()
                 );
 
@@ -31,7 +31,7 @@ public class CacheConfig {
                         "kakaoPlaceCache",
                         Caffeine.newBuilder()
                                 .expireAfterWrite(24, TimeUnit.HOURS)
-                                .maximumSize(50_000)
+                                .maximumSize(200)
                                 .build()
                 );
 
