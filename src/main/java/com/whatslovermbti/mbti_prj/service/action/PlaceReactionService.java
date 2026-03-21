@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Transactional
 public class PlaceReactionService {
+
     private final UserRepository userRepository;
     private final PlaceRepository placeRepository;
     private final PlaceReactionRepository placeReactionRepository;
@@ -48,24 +49,21 @@ public class PlaceReactionService {
                     ActionType oldType = existing.getType();
 
                     if (oldType == type) {
-                        // 같은 반응 → 취소
                         placeReactionRepository.deleteByUserIdAndPlaceIdAndTargetMbtiAndType(
                                 userId, placeId, context, type
                         );
 
                         userActionService.applyUserAction(user, place,
-                                invert(type), context); // -delta
+                                invert(type), context);
                     } else {
-                        // 반응 전환
                         existing.setType(type);
 
                         userActionService.applyUserAction(user, place,
-                                invert(oldType), context); // 기존 반응 제거
+                                invert(oldType), context);
                         userActionService.applyUserAction(user, place,
-                                type, context);            // 새 반응 적용
+                                type, context);
                     }
                 }, () -> {
-                    // 최초 반응
                     placeReactionRepository.save(
                             new PlaceReaction(user, place, type, context)
                     );
@@ -103,10 +101,8 @@ public class PlaceReactionService {
             return;
         }
 
-        // reacton 삭제
         placeReactionRepository.delete(reaction);
 
-        // LIKE 가중치 되돌림
         userActionService.applyUserAction(
                 user,
                 place,

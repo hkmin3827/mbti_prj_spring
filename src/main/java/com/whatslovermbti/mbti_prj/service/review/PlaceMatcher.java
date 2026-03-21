@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PlaceMatcher {
 
-    private static final double NAME_MATCH_THRESHOLD = 0.4; // 40% 이상 공통
+    private static final double NAME_MATCH_THRESHOLD = 0.4;
     private static final double ADDRESS_MATCH_THRESHOLD = 0.5;
 
     public int match(Place place, ReceiptInfo receipt) {
@@ -63,9 +63,6 @@ public class PlaceMatcher {
         return score;
     }
 
-    /**
-     * 토큰 기반 유사도 비교
-     */
     private boolean matchByTokenSimilarity(
             String a,
             String b,
@@ -88,9 +85,6 @@ public class PlaceMatcher {
         return similarity >= threshold;
     }
 
-    /**
-     * OCR 대응 정규화 + 토큰화
-     */
     private Set<String> tokenize(String s) {
 
         String normalized = s.toLowerCase()
@@ -101,7 +95,7 @@ public class PlaceMatcher {
                 .trim();
 
         return Arrays.stream(normalized.split(" "))
-                .filter(t -> t.length() >= 2) // 2글자 이상만
+                .filter(t -> t.length() >= 2)
                 .collect(Collectors.toSet());
     }
 }

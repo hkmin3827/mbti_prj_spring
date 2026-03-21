@@ -18,11 +18,6 @@ public class PlaceKeywordMapper {
     private final KeywordRepository keywordRepository;
     private final PlaceKeywordRepository placeKeywordRepository;
 
-    /**
-     * Place 최초 생성 시 호출
-     * - infer 결과로 "선택된 키워드"에 대해
-     * - category / subCategory 기반 기본 가중치만 부여
-     */
     @Transactional
     public void mapInitialKeywords(
             Place place,
@@ -36,7 +31,6 @@ public class PlaceKeywordMapper {
 
         Map<String, Integer> keywordWeights = new HashMap<>();
 
-        /* ================= CATEGORY 기반 가중치 ================= */
         switch (place.getCategory()) {
             case CAFE -> {
                 boost(keywordWeights, inferredKeywords,
@@ -67,8 +61,6 @@ public class PlaceKeywordMapper {
                 );
             }
         }
-
-        /* ================= SubCategory 기반 가중치 ================= */
 
         if (hasAny(subCategories,
                 PlaceSubCategory.RESTAURANT,
@@ -170,7 +162,6 @@ public class PlaceKeywordMapper {
             );
 
         }
-        /* ---------- 카페 계열 ---------- */
 
         // 디저트카페/디저트: N/F 쪽 + 감성/로맨틱
         if (hasAny(subCategories, PlaceSubCategory.DESSERT, PlaceSubCategory.DESSERT_CAFE)) {
@@ -311,8 +302,6 @@ public class PlaceKeywordMapper {
                     )
             );
         }
-
-        /* ---------- 맛집(음식) 디테일 ---------- */
 
         // 한식: S/F 기반(편안/정서) + 따뜻/가성비/실용
         if (subCategories.contains(PlaceSubCategory.KOREAN)) {
@@ -468,8 +457,6 @@ public class PlaceKeywordMapper {
                     )
             );
         }
-
-        /* ---------- 코스/여행/문화/자연 디테일 ---------- */
 
         // 먹자골목: E/P + 즉흥/활동/가성비
         if (subCategories.contains(PlaceSubCategory.FOOD_ALLEY)) {
@@ -644,7 +631,6 @@ public class PlaceKeywordMapper {
 
         if (keywordWeights.isEmpty()) return;
 
-        /* ================= DB 처리 (벌크) ================= */
         List<String> names = new ArrayList<>(keywordWeights.keySet());
 
         List<Keyword> keywords = keywordRepository.findByNameIn(names);
@@ -667,7 +653,6 @@ public class PlaceKeywordMapper {
         placeKeywordRepository.saveAll(placeKeywords);
     }
 
-    /* ================= util ================= */
     private void boost(
             Map<String, Integer> result,
             List<String> inferred,

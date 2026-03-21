@@ -97,6 +97,5 @@ public class UserProfileService {
                 finalMbti,
                 finalPartnerMbti
         );
-
     }
 }

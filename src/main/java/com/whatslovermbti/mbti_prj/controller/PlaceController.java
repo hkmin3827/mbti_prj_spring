@@ -43,14 +43,10 @@ public class PlaceController {
     ) {
         return reviewQueryService.getReviewsByPlace(placeId, page, size);
     }
-    /**
-     * 통합 장소 검색
-     * - 위치 필수
-     * - category 선택
-     */
+
     @GetMapping("/search")
     public KakaoMapResponse recommend(
-            @AuthenticationPrincipal CustomUserDetails userDetails, // 핵심
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "SELF") MbtiContext context,
             @RequestParam(defaultValue = "37.4979") double lat,
             @RequestParam(defaultValue = "127.0276") double lng,
@@ -58,14 +54,11 @@ public class PlaceController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "2000") int radius
     ) {
-        // 디폴트 위치 : 강남역, 카테고리 : 카페
-
         User user = userDetails.getUser();
 
         Category resolvedCategory =
                 category != null ? category : Category.CAFE;
 
-        // 추천 검색
         return placeSearchService.search(
                 user,
                 context,

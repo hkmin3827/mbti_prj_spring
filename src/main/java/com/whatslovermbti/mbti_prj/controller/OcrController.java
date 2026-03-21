@@ -13,9 +13,6 @@ public class OcrController {
 
     private final GoogleVisionOcrService googleVisionOcrService;
 
-    /**
-     * 영수증 이미지 업로드 → OCR 텍스트 반환 테스트용
-     */
     @PostMapping("/receipt")
     public ResponseEntity<String> extractReceiptText(@RequestParam("file") MultipartFile file) {
         String text = googleVisionOcrService.extractText(file);

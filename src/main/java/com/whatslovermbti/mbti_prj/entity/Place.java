@@ -1,7 +1,6 @@
 package com.whatslovermbti.mbti_prj.entity;
 
 import com.whatslovermbti.mbti_prj.constant.Category;
-import com.whatslovermbti.mbti_prj.infra.kakao.KakaoMapResponse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,25 +23,23 @@ public class Place {
 
     private String address;
     private String roadAddress;
-    private Double longitude;   // 경도
-    private Double latitude;   // 위도
+    private Double longitude;
+    private Double latitude;
 
     private Double rating;
 
     @Column(columnDefinition = "TEXT")
-    private String images;   // 이미지 URL JSON 배열
+    private String images;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String kakaoPlaceId;   // 카카오 PlaceId
+    private String kakaoPlaceId;
     private String telnum;
 
-    // 중간 연결 엔티티
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<PlaceKeyword> placeKeywords = new ArrayList<>();
 
-    // 키워드 추출 메서드
     @Transient
     public List<Keyword> getKeywords() {
         return placeKeywords.stream()

@@ -30,7 +30,7 @@ public class PlaceReaction {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ActionType type; // LIKE / DISLIKE
+    private ActionType type;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

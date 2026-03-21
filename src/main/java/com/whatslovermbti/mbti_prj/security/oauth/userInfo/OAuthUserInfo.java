@@ -6,6 +6,6 @@ public interface OAuthUserInfo {
     String getProviderId();
     String getEmail();
     String getName();
-    Provider getProvider(); // GOOGLE / KAKAO / NAVER
+    Provider getProvider();
 }
 

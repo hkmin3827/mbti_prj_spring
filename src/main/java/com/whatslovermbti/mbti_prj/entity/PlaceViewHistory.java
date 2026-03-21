@@ -1,5 +1,4 @@
 package com.whatslovermbti.mbti_prj.entity;
-// 클릭한 플레이스 (CLICK)
 
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import jakarta.persistence.*;

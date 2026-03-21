@@ -15,9 +15,6 @@ public class PlaceSyncService {
     private final PlaceRepository placeRepository;
     private final KakaoMapClient kakaoMapClient;
 
-    /**
-     * 카카오 기준 place 유효성 검사
-     */
     public void validatePlace(Place place) {
 
         boolean existsOnKakao = kakaoMapClient.existsPlace(place.getKakaoPlaceId());
@@ -27,7 +24,7 @@ public class PlaceSyncService {
         }
 
         if (existsOnKakao && place.isDeleted()) {
-            place.restore(); // 다시 살아난 경우
+            place.restore();
         }
     }
 }

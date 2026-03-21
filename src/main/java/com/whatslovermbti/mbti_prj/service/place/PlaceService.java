@@ -7,7 +7,6 @@ import com.whatslovermbti.mbti_prj.dto.place.PlaceDetailResponse;
 import com.whatslovermbti.mbti_prj.entity.Place;
 import com.whatslovermbti.mbti_prj.entity.PlaceReaction;
 import com.whatslovermbti.mbti_prj.exception.CustomException;
-import com.whatslovermbti.mbti_prj.repository.PlaceBookmarkRepository;
 import com.whatslovermbti.mbti_prj.repository.PlaceReactionRepository;
 import com.whatslovermbti.mbti_prj.repository.PlaceRepository;
 import com.whatslovermbti.mbti_prj.service.action.UserActionQueryService;

@@ -11,6 +11,6 @@ public class ScoreVO {
     public ScoreVO(ReceiptInfo receipt, int score) {
         this.receipt = receipt;
         this.score = score;
-        this.verified = score >= 80; // 기준은 정책
+        this.verified = score >= 80;
     }
 }

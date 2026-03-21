@@ -14,11 +14,9 @@ public class KeywordNormalization {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 외부에서 들어오는 키워드
     @Column(nullable = false)
     private String rawKeyword;
 
-    // 내부 표준 키워드
     @ManyToOne(fetch = FetchType.LAZY)
     private Keyword standardKeyword;
 

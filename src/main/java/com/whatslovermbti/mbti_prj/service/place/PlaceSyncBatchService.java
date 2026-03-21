@@ -18,7 +18,7 @@ public class PlaceSyncBatchService {
     private final PlaceRepository placeRepository;
     private final PlaceSyncService placeSyncService;
 
-    @Scheduled(cron = "0 0 4 * * *") // 서버 켜져있을 시 매일 새벽 4시 자동 호출 됨
+    @Scheduled(cron = "0 0 4 * * *")
     @Transactional
     public void syncPlaces() {
 

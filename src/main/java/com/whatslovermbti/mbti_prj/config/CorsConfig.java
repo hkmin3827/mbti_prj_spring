@@ -19,10 +19,9 @@ public class CorsConfig {
                 "https://lovers-mbti.vercel.app"
         ));
         config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-//        config.setAllowedMethods(List.of(
-//                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-//        ));
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

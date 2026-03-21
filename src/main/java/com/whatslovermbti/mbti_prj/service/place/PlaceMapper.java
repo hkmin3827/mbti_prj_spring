@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.service.place;
-// 카카오 JSON 응답을 PlaceResDto로 변환
-// DB Place 변환 + Kakao Document 변환 둘 다 여기로 모으기
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.whatslovermbti.mbti_prj.constant.Category;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Component
 public class PlaceMapper {
-    // images(TEXT JSON배열) 파싱용 (DB Place -> DTO에서만 사용)
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -57,7 +56,6 @@ public class PlaceMapper {
         );
     }
 
-    // 북마크, 좋아요, 최근본 조회용 mapper
     public PlaceResDto fromBasicEntity(
             Place place,
             Double distance
@@ -67,7 +65,7 @@ public class PlaceMapper {
         return PlaceResDto.fromEntity(
                 place,
                 imageUrls,
-                List.of(),   // 키워드 없음
+                List.of(),
                 distance
         );
     }

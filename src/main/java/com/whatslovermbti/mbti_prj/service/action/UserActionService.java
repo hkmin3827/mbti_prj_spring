@@ -100,7 +100,6 @@ public class UserActionService {
 
         placeViewHistoryRepository.save(history);
 
-        // 최근 20개 유지
         List<Long> ids =
                 placeViewHistoryRepository
                         .findIdsByUserAndTargetMbtiOrderByViewedAtDesc(userId, context);
@@ -113,14 +112,12 @@ public class UserActionService {
         }
     }
 
-    // viewHistory는 삭제해도 가중치 되돌리지 X, 내역을 지우고 싶은 목적이 장소가 마음에 안 들어서가 아니기 때문
     public void removeViewHistory(Long userId, Long placeId) {
         placeViewHistoryRepository.deleteByUserIdAndPlaceId(userId, placeId);
     }
 
     public void applyUserAction(User user, Place place, ActionType actionType, MbtiContext context) {
 
-        // 하루 1회 제한
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
@@ -136,7 +133,7 @@ public class UserActionService {
                         );
 
         if (alreadyLogged) {
-            return; // 하루에 존재하면 로그 + 가중치 반영 전부 중단
+            return;
         }
 
         userActionLogRepository.save(
@@ -176,7 +173,6 @@ public class UserActionService {
 
             double finalDelta = baseDelta * pk.getWeight();
 
-            // 안전하게 점수 누적
             pref.setScore(
                     Math.max(-100, Math.min(100, pref.getScore() + finalDelta))
             );

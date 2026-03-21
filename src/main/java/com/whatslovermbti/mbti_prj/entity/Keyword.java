@@ -16,7 +16,6 @@ public class Keyword {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 내부 표준 키워드
     @Column(unique = true, nullable = false)
     private String name;
 

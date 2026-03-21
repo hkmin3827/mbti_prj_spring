@@ -9,7 +9,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class KakaoMapClient {
 
-    // WebClientConfig에서 만든 Bean 주입 받기
     private final WebClient kakaoWebClient;
 
     @Value("${kakao.map.rest-api-key}")
@@ -29,7 +28,6 @@ public class KakaoMapClient {
     }
 
 
-    // infra는 PlaceResDto를 만들지 않는다. 응답 객체만 반환한다.
     public KakaoMapResponse searchByCategory(
             double lat,
             double lng,
@@ -53,9 +51,7 @@ public class KakaoMapClient {
                 .block();
     }
 
-    /* ==============================
-     키워드 + 위치 검색
-     ============================== */
+
     public KakaoMapResponse searchByKeywordWithLocation(
             String keyword,
             double lat,
@@ -83,6 +79,5 @@ public class KakaoMapClient {
                 .bodyToMono(KakaoMapResponse.class)
                 .block();
     }
-
 }
 

@@ -16,15 +16,13 @@ public class AmountExtractor {
             "소계", "소 계", "매출합계", "매출 합계"
     );
 
-    // 카드번호/승인번호 같은 “긴 숫자”가 나오는 라인 제외
     private static final List<String> AMOUNT_BLACKLIST = List.of(
             "카드번호", "승인번호", "****", "POS", "BILL", "영수증번호", "사업자번호"
     );
 
     private static final int MAX_REASONABLE_AMOUNT = 5_000_000;
-    private static final int MIN_REASONABLE_AMOUNT = 100; // 1, 10 같은 인덱스 제거용
+    private static final int MIN_REASONABLE_AMOUNT = 100;
 
-    // 9,900 / 9900 / 4.545 같은 형태를 잡기 위한 패턴
     private static final Pattern MONEY_PATTERN =
             Pattern.compile("(\\d{1,3}([,]\\d{3})+|\\d+)([.]\\d{3})?");
 
@@ -40,17 +38,15 @@ public class AmountExtractor {
             boolean hasKeyword = AMOUNT_KEYWORDS.stream().anyMatch(k -> normalize(line).contains(k.replace(" ", "")));
             if (!hasKeyword) continue;
 
-            // 1) 현재 라인에서 금액 찾기
             Integer v = parseMoneyFromLine(line);
             if (v != null) {
                 addIfValid(candidates, v);
                 continue;
             }
 
-            // 2) 현재 라인에 금액이 없으면 다음 1~2줄에서 찾기 (영수증에서 매우 흔함)
             for (int j = 1; j <= 2 && i + j < lines.size(); j++) {
                 String next = lines.get(i + j);
-                if (isBlacklisted(next)) break; // 아래가 카드정보면 중단
+                if (isBlacklisted(next)) break;
 
                 Integer nv = parseMoneyFromLine(next);
                 if (nv != null) {
@@ -83,7 +79,6 @@ public class AmountExtractor {
     private Integer parseMoneyFromLine(String line) {
         if (line == null) return null;
 
-        // "1. 카드결제:" 같은 인덱스 제거
         String cleaned = line.replaceAll("^\\s*\\d+\\s*[.)]\\s*", "");
 
         Matcher m = MONEY_PATTERN.matcher(cleaned);
@@ -92,7 +87,6 @@ public class AmountExtractor {
         while (m.find()) {
             String token = m.group();
 
-            // 4.545 같은 케이스는 4,545로 복구 시도
             token = token.replace(".", ",");
 
             int value = toInt(token);

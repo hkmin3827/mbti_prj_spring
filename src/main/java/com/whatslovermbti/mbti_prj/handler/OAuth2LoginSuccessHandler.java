@@ -51,23 +51,17 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     }
 
-    /**
-     * provider별 OAuthUserInfo 매핑
-     * OIDC 여부와 완전히 분리됨
-     */
+
     private OAuthUserInfo resolveOAuthUserInfo(Map<String, Object> attributes) {
 
-        // GOOGLE (OIDC 포함)
         if (attributes.containsKey("sub")) {
             return new GoogleOAuthUserInfo(attributes);
         }
 
-        // KAKAO
         if (attributes.containsKey("kakao_account")) {
             return new KakaoOAuthUserInfo(attributes);
         }
 
-        // NAVER
         if (attributes.containsKey("response")) {
             return new NaverOAuthUserInfo(attributes);
         }

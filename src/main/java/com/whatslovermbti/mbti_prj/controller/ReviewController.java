@@ -54,10 +54,7 @@ public class ReviewController {
             @RequestParam Long placeId,
             @RequestParam int rating,
             @RequestParam String content,
-            // 클라이언트가 S3에 직접 업로드한 URL
             @RequestParam(required = false) String reviewImageUrl,
-
-            // OCR용 영수증만 서버로
             @RequestPart(required = true) MultipartFile receiptImage
     ) {
         User user = userDetails.getUser();

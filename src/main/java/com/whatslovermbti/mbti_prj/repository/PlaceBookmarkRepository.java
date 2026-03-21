@@ -4,6 +4,7 @@ import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.dto.place.PlaceBookmarkContextRow;
 import com.whatslovermbti.mbti_prj.entity.PlaceBookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,4 +32,8 @@ public interface PlaceBookmarkRepository extends JpaRepository<PlaceBookmark, Lo
     List<PlaceBookmarkContextRow> findBookmarkContextsByUser(
             @Param("userId") Long userId
     );
+
+    @Modifying
+    @Query("DELETE FROM PlaceBookmark pb WHERE pb.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

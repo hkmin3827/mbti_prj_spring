@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    // 카카오 로그인
     @Bean
     public WebClient kakaoAuthWebClient(
             WebClient.Builder builder,
@@ -22,7 +21,6 @@ public class WebClientConfig {
                 .build();
     }
 
-    // 카카오지도 API
     @Bean
     public WebClient kakaoWebClient(
             WebClient.Builder builder,
@@ -34,7 +32,6 @@ public class WebClientConfig {
                 .build();
     }
 
-    // GEMINI
     @Bean
     public WebClient geminiWebClient() {
         return WebClient.builder()

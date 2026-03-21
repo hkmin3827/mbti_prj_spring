@@ -54,7 +54,6 @@ public class ReviewQueryService {
                 .map(ReviewResponse::from);
     }
 
-    // 내 리뷰 조회 : soft delete 된 place도 포함
     public Page<ReviewResponse> getMyReviews(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return reviewRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable).map(review -> ReviewResponse.from(review));

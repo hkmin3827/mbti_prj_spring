@@ -64,26 +64,21 @@ public class ReviewService {
             review.setReviewImageUrl(reviewImageUrl);
         }
 
-        // 영수증 업로드 안 한 경우
         if (receiptImage == null || receiptImage.isEmpty()) {
             review.setVerified(false);
             return reviewRepository.save(review);
         }
 
-        // OCR 수행
         String ocrText = ocrService.extractText(receiptImage);
 
-        // OCR 결과를 Line 단위로 분리
         List<String> lines = Arrays.stream(ocrText.split("\\r?\\n"))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())
                 .toList();
 
-        // 영수증 파싱 + 신뢰도 계산
         ScoreVO result =
                 receiptVerificationService.verify(lines);
 
-        // 영수증 중복 검사
         String receiptHash = generateReceiptHash(result.getReceipt());
         boolean alreadyUsed =
                 reviewRepository.existsByUserIdAndReceiptHash(
@@ -94,14 +89,11 @@ public class ReviewService {
             throw new CustomException(ErrorCode.DUPLICATE_RECEIPT_REVIEW);
         }
 
-        // 장소 매칭
         int matchScore = placeMatcher.match(place, result.getReceipt());
         review.setPlaceMatchScore(matchScore);
 
-        // 신뢰도 기준으로 인증 여부 결정
         review.setVerified(result.isVerified());
 
-        // 영수증은 서버에서 S3 업로드 (private)
         String receiptUrl = s3Service.uploadFile(receiptImage, "receipts");
         review.setReceiptImageUrl(receiptUrl);
 
@@ -134,20 +126,16 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
-        // 본인 검증
         if (!review.getUser().getId().equals(user.getId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
-        // 수정
         review.setRating(rating);
         review.setContent(content);
 
-        // 이미지 새로 들어오면 기존거 덮어쓰기
         if(reviewImageUrl != null){
             review.setReviewImageUrl(reviewImageUrl);
         }
-        // 추가 이미지 없고 removeImage true면 이미지 제거
         else if (removeImage) {
             review.setReviewImageUrl(null);
         }
@@ -162,7 +150,6 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
-        // 본인 검증
         if (!review.getUser().getId().equals(user.getId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }

@@ -19,12 +19,6 @@ public class PlaceCandidateService {
     private final KakaoMapClient kakaoMapClient;
     private static final int TARGET_SIZE = 45;
 
-    /**
-     * 후보군 확보 + Place resolve (유일한 진입점)
-     * - Kakao API 호출
-     * - 중복 제거
-     * - Place 영속화
-     */
     @Cacheable(
             value = "kakaoCandidateCache",
             key = "'candidate:' + #lat + ':' + #lng + ':' + #radius + ':' + #category",
@@ -39,7 +33,6 @@ public class PlaceCandidateService {
     ) {
         log.info("Kakao API CALL (CANDIDATE - CATEGORY PAGINATION)");
 
-        // COURSE는 다중 호출
         if (category == Category.COURSE) {
             return searchCourseCandidates(lat, lng, radius);
         }
@@ -48,7 +41,6 @@ public class PlaceCandidateService {
         return searchSingleCategory(lat, lng, radius, categoryCode);
     }
 
-    // 카페, 음식점
     private List<KakaoMapResponse.Document> searchSingleCategory(
             double lat,
             double lng,
@@ -84,7 +76,6 @@ public class PlaceCandidateService {
     }
 
 
-    // 데이트 코스
     private List<KakaoMapResponse.Document> searchCourseCandidates(
             double lat,
             double lng,
@@ -96,7 +87,7 @@ public class PlaceCandidateService {
 
             int page = 1;
             boolean isEnd = false;
-            int MAX_PAGE = 3; // COURSE는 적당히
+            int MAX_PAGE = 3;
 
             while (!isEnd && page <= MAX_PAGE) {
 
@@ -111,7 +102,7 @@ public class PlaceCandidateService {
 
                 for (KakaoMapResponse.Document d : resp.getDocuments()) {
                     if (isExcludedCourseFacility(d)) {
-                        continue; // 숙박, 주차장 등 제거
+                        continue;
                     }
 
                     merged.putIfAbsent(d.getId(), d);

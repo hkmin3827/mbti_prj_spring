@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Order(1) // MbtiKeywordSeeder보다 먼저 실행
+@Order(1)
 public class KeywordSeeder implements CommandLineRunner {
 
     private final KeywordRepository keywordRepository;

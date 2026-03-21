@@ -20,8 +20,7 @@ public class KeywordService {
     private final KeywordNormalizationService keywordNormalizationService;
 
     /**
-     * 단독 표준 키워드 단건 생성 (변이 없음)
-     * (관리자/시드용)
+     * 단독 표준 키워드 단건 생성 (관리자/시드용)
      */
     public Keyword createKeyword(String standardName, MbtiAxis axis) {
 
@@ -37,7 +36,6 @@ public class KeywordService {
         );
     }
 
-    // 표준 키워드 + 형태 변이 세트 생성
     public Keyword createKeywordWithNormalizations(
             String standardName,
             MbtiAxis axis,
@@ -81,7 +79,6 @@ public class KeywordService {
 
     /**
      * 장소 등록 시: 표준 키워드 조회
-     * 없으면 예외 (자동 생성 x)
      */
     public Keyword getOrThrow(String name) {
 

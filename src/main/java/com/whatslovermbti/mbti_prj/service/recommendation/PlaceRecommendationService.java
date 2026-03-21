@@ -19,14 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-// 유저에게 이 후보군 중 무엇을, 어떤 비율로 보여줄 것인가
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PlaceRecommendationService {
 
-    // 상위 몇 개를 “우선 노출 풀”로 볼 것인가
     private static final int TOP_RANGE = 45;
 
     private final KeywordWeightAggregator keywordWeightAggregator;
@@ -36,12 +34,7 @@ public class PlaceRecommendationService {
     private final TargetMbtiResolver mbtiResolver;
     private final UserPreferenceScoreApplier userPreferenceScoreApplier;
 
-    // 핵심 추천 엔진 - 후보군은 확보 되어있고, score로 개인화 처리
-    /*
-     * 규칙:
-     * - DB write 절대 금지
-     * - Kakao API 접근 금지
-     */
+
     public List<KakaoMapResponse.Document> recommendFromCandidates(
             User user,
             MbtiContext context,
@@ -95,7 +88,6 @@ public class PlaceRecommendationService {
                         .toList();
 
 
-        // RandomPicker에게 전부 위임
         List<KakaoMapResponse.Document> result =
                 RandomPicker.pickWithBias(
                         scored.stream()

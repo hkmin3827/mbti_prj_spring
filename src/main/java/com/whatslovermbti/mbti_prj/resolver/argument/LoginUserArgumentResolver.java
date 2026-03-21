@@ -18,7 +18,6 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        // @LoginUser 붙어있고 파라미터 타입이 Long일 때만 처리
         return parameter.hasParameterAnnotation(LoginUser.class)
                 && parameter.getParameterType().equals(Long.class);
     }
@@ -39,6 +38,6 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userDetails.getUser().getId(); // 로그인 유저의 userId 반환
+        return userDetails.getUser().getId();
     }
 }

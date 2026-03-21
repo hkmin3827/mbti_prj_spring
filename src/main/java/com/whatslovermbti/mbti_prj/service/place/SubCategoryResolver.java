@@ -17,7 +17,6 @@ public class SubCategoryResolver {
             return result;
         }
         String t = categoryName;
-        /* ===================== FD6 : 음식점 (기존) ===================== */
 
         if (contains(t, "레스토랑")) {
             result.add(PlaceSubCategory.RESTAURANT);
@@ -56,7 +55,6 @@ public class SubCategoryResolver {
             result.add(PlaceSubCategory.QUICK_MEAL);
         }
 
-        /* ===================== FD6 : 음식점 (추가) ===================== */
 
         if (contains(t, "한식")) result.add(PlaceSubCategory.KOREAN);
         if (contains(t, "일식")) result.add(PlaceSubCategory.JAPANESE);
@@ -73,7 +71,7 @@ public class SubCategoryResolver {
         if (contains(t, "샐러드")) result.add(PlaceSubCategory.SALAD);
         if (contains(t, "도시락")) result.add(PlaceSubCategory.LUNCHBOX);
 
-        // 간식: 길거리/디저트가 아닌 "식사 대용 간편식" 느낌
+
         if (contains(t, "간식", "토스트", "핫도그", "붕어빵", "떡볶이")) {
             result.add(PlaceSubCategory.SNACK);
         }
@@ -106,7 +104,6 @@ public class SubCategoryResolver {
             result.add(PlaceSubCategory.IZAKAYA);
         }
 
-        /* ===================== CE7 : 카페 (기존) ===================== */
 
         if (contains(t, "베이커리")) {
             result.add(PlaceSubCategory.BAKERY);
@@ -122,7 +119,7 @@ public class SubCategoryResolver {
 
         if (contains(t, "북카페")) {
             result.add(PlaceSubCategory.BOOK_CAFE);
-            result.add(PlaceSubCategory.STUDY_CAFE); // 조용/독서 성격 공유
+            result.add(PlaceSubCategory.STUDY_CAFE);
         }
 
         if (contains(t, "루프탑")) {
@@ -133,7 +130,6 @@ public class SubCategoryResolver {
             result.add(PlaceSubCategory.TERRACE);
         }
 
-        /* ===================== CE7 : 카페 (추가) ===================== */
 
         if (contains(t, "키즈카페")) result.add(PlaceSubCategory.KIDS_CAFE);
         if (contains(t, "전통찻집", "전통차", "찻집")) result.add(PlaceSubCategory.TRADITIONAL_TEA_HOUSE);
@@ -147,7 +143,6 @@ public class SubCategoryResolver {
         if (contains(t, "다방")) result.add(PlaceSubCategory.DABANG);
         if (contains(t, "카페거리")) result.add(PlaceSubCategory.CAFE_STREET);
 
-        /* ===================== COURSE (기존) ===================== */
         if (contains(t, "공원")) {
             result.add(PlaceSubCategory.PARK);
         }
@@ -195,8 +190,6 @@ public class SubCategoryResolver {
             result.add(PlaceSubCategory.ACTIVITY);
             result.add(PlaceSubCategory.SPORTS_LEISURE);
         }
-
-        /* ===================== COURSE (추가) ===================== */
 
         if (contains(t, "먹자골목")) result.add(PlaceSubCategory.FOOD_ALLEY);
         if (contains(t, "테마파크")) result.add(PlaceSubCategory.THEME_PARK);

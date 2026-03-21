@@ -3,7 +3,6 @@ package com.whatslovermbti.mbti_prj.controller;
 import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.dto.review.ReviewResponse;
 import com.whatslovermbti.mbti_prj.entity.Place;
-import com.whatslovermbti.mbti_prj.entity.Review;
 import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -31,26 +30,22 @@ public class AdminController {
         );
     }
 
-    // 활성 회원 조회
     @GetMapping("/users/active")
     public ResponseEntity<Page<User>> getActiveUsers(Pageable pageable) {
         return ResponseEntity.ok(adminService.getActiveUsers(pageable));
     }
 
-    // 비활성 회원 조회
     @GetMapping("/users/inactive")
     public ResponseEntity<Page<User>> getInactiveUsers(Pageable pageable) {
         return ResponseEntity.ok(adminService.getInactiveUsers(pageable));
     }
 
-    // 회원 활성화
     @PatchMapping("/users/{userId}/activate")
     public ResponseEntity<Void> activateUser(@PathVariable Long userId) {
         adminService.activateUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    // 회원 비활성화
     @PatchMapping("/users/{userId}/deactivate")
     public ResponseEntity<Void> deactivateUser(@PathVariable Long userId) {
         adminService.deactivateUser(userId);
@@ -65,7 +60,6 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getReviews(placeName, pageable));
     }
 
-    // 리뷰 삭제
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
         adminService.deleteReview(reviewId);

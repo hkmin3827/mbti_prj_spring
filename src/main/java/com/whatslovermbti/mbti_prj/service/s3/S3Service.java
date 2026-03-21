@@ -48,7 +48,6 @@ public class S3Service {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
-//                .contentType(contentType)
                 .build();
 
         PutObjectPresignRequest presignRequest =
@@ -70,7 +69,6 @@ public class S3Service {
         return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/"
                 + folder + "/" + fileName;
     }
-    /* ================= 검증 로직 ================= */
 
     private void validateFolder(String folder) {
         if (!ALLOWED_FOLDERS.contains(folder)) {
@@ -95,17 +93,12 @@ public class S3Service {
         return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + key;
     }
 
-    /* ================= DTO ================= */
 
     public record PresignedUpload(
             String uploadUrl,
             String fileUrl
     ) {}
 
-
-
-
-    // presigned랑 별개로 서버에서 직접 올리는 방식 : 리뷰이미지 업로드 확인용. ocr에도 적용 가능
     public String uploadFile(MultipartFile file, String folder) {
         try {
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();

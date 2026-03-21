@@ -28,6 +28,5 @@ public class UserKeywordPreference {
     @Enumerated(EnumType.STRING)
     MbtiContext targetMbti;
 
-    // 선호 점수 (-100 ~ +100 권장)
     private double score;
 }

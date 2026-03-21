@@ -16,7 +16,6 @@ public class KeywordNormalizationService {
     private final KeywordNormalizationRepository normalizationRepository;
     private final KeywordRepository keywordRepository;
 
-    // 외부 키워드 -> 내부표준키워드 조회 메서드
     public Keyword normalize(String inputKeyword) {
 
         String normalized =

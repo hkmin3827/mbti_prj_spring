@@ -4,7 +4,7 @@ import com.whatslovermbti.mbti_prj.receipt.model.ReceiptInfo;
 import org.springframework.stereotype.Component;
 
 
-// 현재 사용 X, 영수증 모든 정보가 강제로 필요한 상황에서 사용
+// 현재 사용 X, 영수증 모든 정보가 강제로 필요한 상황에서 확장 시 사용 가능
 @Component
 public class ReceiptValidator {
 

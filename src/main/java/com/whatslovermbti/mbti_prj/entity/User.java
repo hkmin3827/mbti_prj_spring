@@ -22,7 +22,7 @@ public class User {
     private Long id;
 
     @Column(unique = true)
-    private String email;   // 소셜 계정 이메일 포함, 카카오같이 이메일 없을 수 있으므로 nullable = true
+    private String email;   // 소셜 계정 이메일 포함, nullable = true
 
     @Column(length = 30)
     private String name;
@@ -31,15 +31,15 @@ public class User {
     private String password;   // 소셜 로그인 계정은 null
 
     @Column(nullable = false)
-    private Provider provider;   // 로그인 종류 (Local/google/kakao/naver)
-    private String oauthId;   // 필수. 소셜 로그인 고유값
+    private Provider provider;
+    private String oauthId;
 
     private String mbti;
-    private String partnerMbti;   // 상대 MBTI (옵션)
+    private String partnerMbti;  // optional
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;     // USER / ADMIN
+    private Role role = Role.USER;
 
 
     @Column(length = 30)
@@ -61,7 +61,6 @@ public class User {
 
     private LocalDateTime lastLogoutAt;
 
-    // JWT 탈취 최소 방어
     public void logout() {
         this.lastLogoutAt = LocalDateTime.now();
     }

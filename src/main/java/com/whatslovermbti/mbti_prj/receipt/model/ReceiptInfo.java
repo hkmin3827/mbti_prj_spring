@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.receipt.model;
 
-// VO
 import lombok.Getter;
 import lombok.Setter;
 

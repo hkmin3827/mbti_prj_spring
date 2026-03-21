@@ -43,7 +43,7 @@ public class AdminService {
         Role targetRole = Role.USER;
 
         if (!hasKeyword && active == null) {
-            return userRepository.findByRole(targetRole, pageable); // 기본 전체 조회
+            return userRepository.findByRole(targetRole, pageable);
         }
 
         if (hasKeyword && active == null) {
@@ -93,7 +93,6 @@ public class AdminService {
         user.deactivate();
     }
 
-
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviews(String placeName, Pageable pageable) {
 
@@ -102,18 +101,15 @@ public class AdminService {
 
         Page<Review> page;
 
-        // 기본: 전체 리뷰
         if (!hasPlaceName) {
             page = reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
         } else {
-            // Place 이름으로 필터
             page = reviewRepository
                     .findByPlace_NameContainingIgnoreCaseOrderByCreatedAtDesc(
                             placeName, pageable
                     );
         }
 
-        // ✅ 엔티티 -> DTO 변환 (LazyProxy 직렬화 문제 차단)
         return page.map(ReviewResponse::from);
     }
 
@@ -136,23 +132,19 @@ public class AdminService {
 
         boolean hasKeyword = keyword != null && keyword.trim().length() >= 2;
 
-        // 전체 조회 (기본)
         if (!hasKeyword && category == null) {
             return placeRepository.findAll(pageable);
         }
 
-        // 카테고리만 필터
         if (!hasKeyword) {
             return placeRepository.findByCategory(category, pageable);
         }
 
-        // 검색만
         if (category == null) {
             return placeRepository.findByNameContainingIgnoreCase(
                     keyword, pageable);
         }
 
-        // 검색 + 카테고리
         return placeRepository.findByCategoryAndNameContainingIgnoreCase(
                 category, keyword, pageable);
     }
@@ -169,7 +161,7 @@ public class AdminService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
 
         if (!place.isDeleted()) {
-            return; // 이미 활성 상태
+            return;
         }
 
         place.setDeleted(false);
@@ -180,20 +172,16 @@ public class AdminService {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
 
-        // 연관 리뷰 삭제
         reviewRepository.deleteByPlaceId(place.getId());
 
         userActionLogRepository.deleteByPlaceId(placeId);
 
-        // 행동 데이터 삭제
         placeBookmarkRepository.deleteByPlaceId(place.getId());
         placeViewHistoryRepository.deleteByPlaceId(place.getId());
         placeReactionRepository.deleteByPlaceId(place.getId());
 
-        // 연관 키워드 연결 삭제 (PlaceKeyword)
         placeKeywordRepository.deleteByPlaceId(place.getId());
 
-        // Place 자체 삭제
         placeRepository.delete(place);
     }
 

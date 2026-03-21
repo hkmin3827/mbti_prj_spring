@@ -2,7 +2,6 @@ package com.whatslovermbti.mbti_prj.controller;
 
 import com.whatslovermbti.mbti_prj.dto.user.BasicProfileReq;
 import com.whatslovermbti.mbti_prj.dto.user.MbtiProfileReq;
-import com.whatslovermbti.mbti_prj.dto.user.ProfileReqDto;
 import com.whatslovermbti.mbti_prj.security.auth.CustomUserDetails;
 import com.whatslovermbti.mbti_prj.service.UserProfileService;
 import lombok.RequiredArgsConstructor;

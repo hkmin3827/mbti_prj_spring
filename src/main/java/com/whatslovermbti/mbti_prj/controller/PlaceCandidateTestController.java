@@ -19,10 +19,7 @@ public class PlaceCandidateTestController {
 
     private final PlaceCandidateService placeCandidateService;
 
-    /**
-     * 카카오 카테고리 페이지네이션 테스트
-     * ex: /test/places/candidates?lat=37.5665&lng=126.9780&category=CE7
-     */
+
     @GetMapping("/candidates")
     public CandidateTestResponse testCandidates(
             @RequestParam(defaultValue = "37.4979") double lat,
@@ -30,8 +27,6 @@ public class PlaceCandidateTestController {
             @RequestParam(required = false) Category category,
             @RequestParam(defaultValue = "2000") int radius
     ) {
-        // 디폴트 위도, 경도 위치 : 강남역
-
         Category resolvedCategory =
                 category != null ? category : Category.CAFE;
 
@@ -49,9 +44,6 @@ public class PlaceCandidateTestController {
         );
     }
 
-    /**
-     * 테스트용 응답 DTO
-     */
     public record CandidateTestResponse(
             int count,
             List<KakaoMapResponse.Document> documents

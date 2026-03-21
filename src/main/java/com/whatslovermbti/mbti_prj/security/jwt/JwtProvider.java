@@ -1,4 +1,5 @@
 package com.whatslovermbti.mbti_prj.security.jwt;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -36,7 +37,7 @@ public class JwtProvider {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token)// 서명 검증 + 만료 검증(만료면 예외)
+                .parseClaimsJws(token)
                 .getBody();
 
         return Long.valueOf(claims.getSubject());

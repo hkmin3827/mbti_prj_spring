@@ -5,6 +5,7 @@ import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import com.whatslovermbti.mbti_prj.dto.place.PlaceLikedContextRow;
 import com.whatslovermbti.mbti_prj.entity.PlaceReaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -47,5 +48,7 @@ public interface PlaceReactionRepository extends JpaRepository<PlaceReaction, Lo
             @Param("type") ActionType type
     );
 
-
+    @Modifying
+    @Query("DELETE FROM PlaceReaction pr WHERE pr.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

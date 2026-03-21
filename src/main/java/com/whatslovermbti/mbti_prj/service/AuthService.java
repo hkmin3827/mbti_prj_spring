@@ -26,7 +26,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final KakaoUnlinkClient kakaoUnlinkClient;
 
-    // 회원가입
     public void signup(SignUpReqDto dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
@@ -44,7 +43,6 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // 로그인 (세션 or JWT 선택 가능)
     public User login(LoginReqDto dto) {
 
         User user = userRepository.findByEmail(dto.getEmail())
@@ -68,7 +66,7 @@ public class AuthService {
                     User user = new User();
                     user.setProvider(info.getProvider());
                     user.setOauthId(info.getProviderId());
-                    user.setEmail(info.getEmail()); // null 허용
+                    user.setEmail(info.getEmail());
                     user.setName(info.getName());
                     user.setRole(Role.USER);
                     return userRepository.save(user);
@@ -81,7 +79,6 @@ public class AuthService {
             throw new IllegalArgumentException("탈퇴 확인 문구가 올바르지 않습니다.");
         }
 
-        // 카카오면 제공자랑 계정 연결까지 해제
         if (user.getProvider() == Provider.KAKAO) {
             try {
                 kakaoUnlinkClient.unlink(user.getOauthId());
@@ -90,8 +87,6 @@ public class AuthService {
             }
         }
 
-        // 삭제
         userRepository.delete(user);
-        // → DB에서 ON DELETE CASCADE로 연관 엔티티 자동 삭제
     }
 }

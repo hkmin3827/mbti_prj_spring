@@ -8,6 +8,7 @@ import com.whatslovermbti.mbti_prj.entity.User;
 import com.whatslovermbti.mbti_prj.entity.UserActionLog;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -52,6 +53,9 @@ public interface UserActionLogRepository extends JpaRepository<UserActionLog, Lo
     List<PlaceViewCountDto> findMostViewedPlacesByEffectiveMbti(
             @Param("mbti") String mbti,
             @Param("actionType") ActionType actionType,
-            Pageable pageable)
-            ;
+            Pageable pageable);
+
+    @Modifying
+    @Query("DELETE FROM UserActionLog ual WHERE ual.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

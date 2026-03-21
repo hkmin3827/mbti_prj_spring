@@ -17,7 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             String oauthId
     );
 
-    /* ================= USER ROLE 전용 조회 ================= */
     Page<User> findByRole(Role role, Pageable pageable);
 
     Page<User> findByRoleAndNameContainingIgnoreCase(

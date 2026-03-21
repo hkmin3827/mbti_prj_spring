@@ -17,20 +17,17 @@ public class PlaceResDto {
     private Double latitude;
     private Double longitude;
 
-    // soft delete 상태
     private final boolean deleted;
 
-    private Double rating;  // 우리회원 평가
-    private List<String> imageUrls;   // 회원들이 올린 리뷰 사진
+    private Double rating;
+    private List<String> imageUrls;
 
     private String kakaoPlaceId;
 
-    // 추천/표시용
     private List<String> keywords;
-    private Double distance;   // km (계산값)
+    private Double distance;
 
 
-    // mbtiContext별 저장 상태 (좋아요)
     private Set<MbtiContext> likedContexts = Set.of();
     public void setLikedContexts(Set<MbtiContext> likedContexts) {
         this.likedContexts = likedContexts;
@@ -39,7 +36,6 @@ public class PlaceResDto {
     private MbtiContext bookmarkedContext;
     public void setBookmarkedContext(MbtiContext bookmarkedContext) {this.bookmarkedContext = bookmarkedContext;}
 
-    // 내부 공용 생성자
     private PlaceResDto(
             Long id,
             String name,
@@ -69,7 +65,6 @@ public class PlaceResDto {
     }
 
 
-    // 카카오 Document → DTO (추천 / 검색 단계)
     public static PlaceResDto fromKakao(
             String name,
             Category category,
@@ -81,15 +76,15 @@ public class PlaceResDto {
             Double distance
     ) {
         return new PlaceResDto(
-                null,               // DB id 없음
+                null,
                 name,
                 category,
                 address,
                 latitude,
                 longitude,
-                false,              // 카카오 응답은 deleted 개념 없음
-                null,               // rating 없음
-                List.of(),           // image 없음
+                false,
+                null,
+                List.of(),
                 kakaoPlaceId,
                 keywords,
                 distance
@@ -97,7 +92,6 @@ public class PlaceResDto {
     }
 
 
-    // DB Place → DTO (마이페이지 / 저장 / 리뷰 조회)
         public static PlaceResDto fromEntity(
                 Place place,
                 List<String> imageUrls,

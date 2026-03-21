@@ -3,12 +3,8 @@ package com.whatslovermbti.mbti_prj.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class    MbtiAxisUtil {
+public class MbtiAxisUtil {
 
-    /**
-     * INTJ → {I=1, N=1, T=1, J=1}
-     * ESFP → {E=1, S=1, F=1, P=1}
-     */
     public static Map<String, Integer> parseAxes(String mbti) {
         Map<String, Integer> axes = new HashMap<>();
 

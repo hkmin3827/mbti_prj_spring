@@ -17,7 +17,6 @@ public class KakaoOAuthUserInfo implements OAuthUserInfo {
 
     @Override
     public String getProviderId() {
-        // kakao 고유 id (Long → String)
         return String.valueOf(attributes.get("id"));
     }
 

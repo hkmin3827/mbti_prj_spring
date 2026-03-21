@@ -1,5 +1,4 @@
 package com.whatslovermbti.mbti_prj.entity;
-// 저장된 플레이스 (SAVE)
 
 import com.whatslovermbti.mbti_prj.constant.MbtiContext;
 import jakarta.persistence.*;

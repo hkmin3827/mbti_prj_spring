@@ -1,7 +1,6 @@
 package com.whatslovermbti.mbti_prj.infra.kakao;
 
 import com.whatslovermbti.mbti_prj.constant.Category;
-import com.whatslovermbti.mbti_prj.constant.KakaoCategoryCode;
 
 public class KakaoCategoryMapper {
 
@@ -22,7 +21,7 @@ public class KakaoCategoryMapper {
         return switch (kakaoCategoryCode) {
             case "FD6" -> Category.FOOD;
             case "CE7" -> Category.CAFE;
-            default -> Category.COURSE; // AT4, CT1, LEI 등
+            default -> Category.COURSE;
         };
     }
 

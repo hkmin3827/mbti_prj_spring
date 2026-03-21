@@ -21,7 +21,7 @@ public class ReviewResponse {
 
     private UserInfo user;
     private PlaceInfo place;
-    private Boolean mine; // 내가 작성한 리뷰 여부
+    private Boolean mine;
 
     public static ReviewResponse from(Review review) {
         return new ReviewResponse(

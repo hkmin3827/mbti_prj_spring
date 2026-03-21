@@ -5,6 +5,5 @@ import java.lang.annotation.*;
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-// user id (Long 타입) 반환
 public @interface LoginUser {
 }

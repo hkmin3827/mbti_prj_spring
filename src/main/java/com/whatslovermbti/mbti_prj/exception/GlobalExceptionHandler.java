@@ -9,10 +9,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.nio.file.AccessDeniedException;
 
-@RestControllerAdvice // (전역 예외 처리)
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 공통 에러 응답 객체
     static class ErrorResponse {
         private final int status;
         private final String code;

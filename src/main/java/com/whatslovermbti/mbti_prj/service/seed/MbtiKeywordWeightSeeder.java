@@ -25,14 +25,12 @@ public class MbtiKeywordWeightSeeder implements CommandLineRunner {
     private final MbtiKeywordWeightRepository weightRepository;
     private final SeedHistoryRepository seedHistoryRepository;
 
-    // 해당 mbti 축이 해당 키워드를 얼마나 선호하는가
     @Override
     public void run(String... args) {
         if (seedHistoryRepository.existsById("MBTI_KEYWORD_WEIGHT")) {
             return;
         }
 
-        // 시드 실행
         Map<String, Keyword> keywordMap =
                 keywordRepository.findAll().stream()
                         .collect(Collectors.toMap(Keyword::getName, k -> k));
@@ -134,7 +132,6 @@ public class MbtiKeywordWeightSeeder implements CommandLineRunner {
             try {
                 weightRepository.save(mw);
             } catch (DataIntegrityViolationException e) {
-                // 이미 존재하면 무시 (중복 방지)
             }
         }
     }

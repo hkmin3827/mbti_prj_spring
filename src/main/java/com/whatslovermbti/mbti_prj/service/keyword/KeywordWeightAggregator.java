@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// MBTI + 유저 행동 → 키워드 점수 집계
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,6 @@ public class KeywordWeightAggregator {
     private final MbtiKeywordWeightRepository mbtiKeywordWeightRepository;
     private final UserKeywordPreferenceRepository userKeywordPreferenceRepository;
 
-    // MBTI 기준 키워드 기본 가중치 Map
     public Map<String, Integer> getMbtiKeywordWeightMapByName(String mbti) {
 
         Set<MbtiAxis> axes =
@@ -53,7 +51,6 @@ public class KeywordWeightAggregator {
         return map;
     }
 
-    // 사용자 행동 기반 키워드 선호 Map : 키워드 이름 기준
     public Map<String, Double> getUserKeywordPreferenceMapByName(User user) {
         return userKeywordPreferenceRepository.findAllByUser(user).stream()
                 .collect(Collectors.toMap(
@@ -64,8 +61,6 @@ public class KeywordWeightAggregator {
     }
 
 
-    // 통합 키워드 점수 Map : 키워드 이름 기준
-    // Mbti 기본 가중치 + 유저 행동 가중치
     public Map<String, Double> getCombinedKeywordWeightMapByName(
             User user,
             String targetMbti

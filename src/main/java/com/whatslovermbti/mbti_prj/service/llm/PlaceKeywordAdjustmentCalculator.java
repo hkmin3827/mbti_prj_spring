@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.service.llm;
 
-import com.whatslovermbti.mbti_prj.constant.MbtiAxis;
 import com.whatslovermbti.mbti_prj.entity.Keyword;
 import com.whatslovermbti.mbti_prj.service.keyword.KeywordNormalizationService;
 import com.whatslovermbti.mbti_prj.service.llm.dto.PlaceAtmosphereResult;
@@ -12,13 +11,10 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class PlaceKeywordAdjustmentCalculator {
-    // AI가 주는 raw Keyword가 중복으로 정규화시 동일 키워드가 되면 1번만 반영
+
     private static final int ATMOSPHERE_BOOST = 2;
     private final KeywordNormalizationService normalizationService;
 
-    /**
-     * 분위기 키워드 → 표준 Keyword → 가중치 보정 Map
-     */
     public Map<Keyword, Integer> calculate(
             PlaceAtmosphereResult atmosphere
     ) {

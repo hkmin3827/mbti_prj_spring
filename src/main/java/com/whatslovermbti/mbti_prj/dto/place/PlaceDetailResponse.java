@@ -10,7 +10,6 @@ import lombok.Getter;
 @Builder
 public class PlaceDetailResponse {
 
-    // Place 기본 정보
     private Long id;
     private String name;
     private Category category;
@@ -20,20 +19,15 @@ public class PlaceDetailResponse {
     private Double latitude;
     private Double longitude;
 
-    private Double rating;        // 리뷰 평균 평점
-    private String description;   // 장소 설명
+    private Double rating;
+    private String description;
 
     private String kakaoPlaceId;
     private String telnum;
 
-    // User 기준 정보
-    private ActionType myReaction;   // LIKE / DISLIKE / null
+    private ActionType myReaction;
     private boolean bookmarked;
 
-    /**
-     * Place 엔티티 기반 기본 정보 세팅용
-     * (user 상태는 QueryService에서 추가)
-     */
     public static PlaceDetailResponse.PlaceDetailResponseBuilder fromPlace(
             Place place
     ) {

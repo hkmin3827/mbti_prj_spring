@@ -7,13 +7,14 @@ import com.whatslovermbti.mbti_prj.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHistory, Long> {
-    // VIEW 가중치 반영은 하루에 1회 조회된 것으로만 계산
+
     boolean existsByUserAndPlaceAndTargetMbtiAndViewedAtBetween(
             User user,
             Place place,
@@ -22,7 +23,6 @@ public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHisto
             LocalDateTime end
     );
 
-    // 최근 조회한 장소들 (최신순)
     @Query("""
         select v
         from PlaceViewHistory v
@@ -77,4 +77,7 @@ public interface PlaceViewHistoryRepository extends JpaRepository<PlaceViewHisto
             MbtiContext targetMbti
     );
 
+    @Modifying
+    @Query("DELETE FROM PlaceViewHistory pvh WHERE pvh.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

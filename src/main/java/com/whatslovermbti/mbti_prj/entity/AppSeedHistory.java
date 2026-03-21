@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AppSeedHistory {
 
-    // 파일 실행 시 키워드 존재유무 체크 X
     @Id
     private String name;
 }

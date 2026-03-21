@@ -1,6 +1,5 @@
 package com.whatslovermbti.mbti_prj.infra.kakao;
-// 카카오 맵에서 내려주는 JSON을 자바 객체로 받음
-// 서비스로직에서 이걸 거리 계산, Category 매핑, 키워드 매핑, PlaceResDto로 변환
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.whatslovermbti.mbti_prj.infra.kakao.dto.KakaoKeywordResponse;
 import lombok.Getter;
@@ -18,9 +17,6 @@ public class KakaoMapResponse {
     private List<Document> documents = new ArrayList<>();
     private Meta meta;
 
-    /* ==============================
-       keyword 응답 → 공통 응답 변환
-       ============================== */
     public static KakaoMapResponse from(KakaoKeywordResponse keywordResponse) {
 
         KakaoMapResponse response = new KakaoMapResponse();

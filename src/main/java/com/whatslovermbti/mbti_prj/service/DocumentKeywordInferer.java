@@ -1,5 +1,4 @@
 package com.whatslovermbti.mbti_prj.service;
-// Document -> 키워드 추출기
 
 import com.whatslovermbti.mbti_prj.constant.Category;
 import com.whatslovermbti.mbti_prj.constant.PlaceSubCategory;
@@ -21,7 +20,6 @@ public class DocumentKeywordInferer {
             return keywords;
         }
 
-        /* ================= CATEGORY 기본 ================= */
         switch (category) {
             case CAFE -> {
                 add(keywords, "감성적인");
@@ -41,7 +39,6 @@ public class DocumentKeywordInferer {
             }
         }
 
-        /* ================= SubCategory 기반 ================= */
 
         if (hasAny(subCategories,
                 PlaceSubCategory.RESTAURANT,
@@ -114,7 +111,6 @@ public class DocumentKeywordInferer {
         return keywords;
     }
 
-    /* ================= util ================= */
     private void add(List<String> list, String keyword) {
         if (!list.contains(keyword)) {
             list.add(keyword);

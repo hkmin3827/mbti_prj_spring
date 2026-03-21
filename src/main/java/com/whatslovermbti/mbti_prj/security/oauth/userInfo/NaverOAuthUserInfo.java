@@ -24,7 +24,7 @@ public class NaverOAuthUserInfo implements OAuthUserInfo{
 
     @Override
     public String getProviderId() {
-        return attributes.get("id").toString(); // 네이버 고유 ID
+        return attributes.get("id").toString();
     }
 
     @Override
