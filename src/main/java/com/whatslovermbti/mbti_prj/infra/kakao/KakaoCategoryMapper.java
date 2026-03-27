@@ -1,6 +1,6 @@
 package com.whatslovermbti.mbti_prj.infra.kakao;
 
-import com.whatslovermbti.mbti_prj.constant.Category;
+import com.whatslovermbti.mbti_prj.global.constant.Category;
 
 public class KakaoCategoryMapper {
 
