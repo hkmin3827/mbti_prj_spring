@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GeminiService {
+public class KeywordExtractPromptService {
 
     private final GeminiClient geminiClient;
 

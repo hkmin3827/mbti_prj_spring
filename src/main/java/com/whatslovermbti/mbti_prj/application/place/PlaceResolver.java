@@ -10,7 +10,7 @@ import com.whatslovermbti.mbti_prj.infra.kakao.KakaoCategoryMapper;
 import com.whatslovermbti.mbti_prj.domain.placeKeyword.repository.PlaceKeywordRepository;
 import com.whatslovermbti.mbti_prj.domain.place.repository.PlaceRepository;
 import com.whatslovermbti.mbti_prj.application.recommendation.DocumentKeywordInferer;
-import com.whatslovermbti.mbti_prj.application.placeKeywordRefiner.GeminiService;
+import com.whatslovermbti.mbti_prj.application.placeKeywordRefiner.KeywordExtractPromptService;
 import com.whatslovermbti.mbti_prj.application.placeKeywordRefiner.PlaceKeywordAdjustmentCalculator;
 import com.whatslovermbti.mbti_prj.domain.placeKeywordRefiner.dto.PlaceAtmosphereResult;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class PlaceResolver {
     private final SubCategoryResolver subCategoryResolver;
     private final DocumentKeywordInferer documentKeywordInferer;
     private final PlaceKeywordAdjustmentCalculator placeKeywordAdjustmentCalculator;
-    private final GeminiService geminiService;
+    private final KeywordExtractPromptService keywordExtractPromptService;
     private final ApplicationEventPublisher eventPublisher;
     private final PlaceKeywordRepository placeKeywordRepository;
 
@@ -109,7 +109,6 @@ public class PlaceResolver {
 
         placeKeywordMapper.mapInitialKeywords(place, subCategories, inferredKeywords);
 
-        // 기존 place도 AI 보정 트리거
         eventPublisher.publishEvent(
                 new PlaceCreatedEvent(place.getId())
         );
@@ -140,7 +139,7 @@ public class PlaceResolver {
 
         try{
         PlaceAtmosphereResult atmosphere =
-                geminiService.analyzePlaceAtmosphere(
+                keywordExtractPromptService.analyzePlaceAtmosphere(
                         place.getName(),
                         place.getAddress(),
                         place.getCategory().name()

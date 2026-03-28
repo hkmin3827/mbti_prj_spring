@@ -1,7 +1,7 @@
 package com.whatslovermbti.mbti_prj.interfaces;
 
 import com.whatslovermbti.mbti_prj.domain.placeKeywordRefiner.dto.PlaceAtmosphereTestRequest;
-import com.whatslovermbti.mbti_prj.application.placeKeywordRefiner.GeminiService;
+import com.whatslovermbti.mbti_prj.application.placeKeywordRefiner.KeywordExtractPromptService;
 import com.whatslovermbti.mbti_prj.domain.placeKeywordRefiner.dto.PlaceAtmosphereResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/test/llm")
 public class LlmTestController {
 
-    private final GeminiService geminiService;
+    private final KeywordExtractPromptService geminiService;
 
     @PostMapping("/place-atmosphere")
     public ResponseEntity<PlaceAtmosphereResult> analyzePlaceAtmosphere(

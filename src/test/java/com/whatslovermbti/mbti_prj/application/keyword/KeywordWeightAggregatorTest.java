@@ -33,12 +33,8 @@ class KeywordWeightAggregatorTest {
     @InjectMocks
     KeywordWeightAggregator aggregator;
 
-    /**
-     * 1️⃣ MBTI 기준 키워드 기본 가중치 집계
-     */
     @Test
     void MBTI_축에_해당하는_키워드_가중치가_합산된다() {
-        // given
         MbtiKeywordWeight w1 = mock(MbtiKeywordWeight.class);
         MbtiKeywordWeight w2 = mock(MbtiKeywordWeight.class);
 
@@ -54,7 +50,6 @@ class KeywordWeightAggregatorTest {
         when(mbtiKeywordWeightRepository.findAllByAxes(any(Set.class)))
                 .thenReturn(List.of(w1, w2));
 
-        // static 메서드 mock (핵심 포인트)
         try (MockedStatic<MbtiAxisUtil> mocked = mockStatic(MbtiAxisUtil.class)) {
             mocked.when(() -> MbtiAxisUtil.parseAxes("ENFP"))
                     .thenReturn(Map.of(
@@ -65,21 +60,15 @@ class KeywordWeightAggregatorTest {
                     ));
 
 
-            // when
             Map<String, Integer> result =
                     aggregator.getMbtiKeywordWeightMapByName("ENFP");
 
-            // then
             assertThat(result.get("감성")).isEqualTo(15);
         }
     }
 
-    /**
-     * 2️⃣ 유저 행동 기반 키워드 선호 점수 집계
-     */
     @Test
     void 유저_행동_키워드_점수가_이름_기준으로_합산된다() {
-        // given
         User user = mock(User.class);
 
         UserKeywordPreference p1 = mock(UserKeywordPreference.class);
@@ -97,20 +86,14 @@ class KeywordWeightAggregatorTest {
         when(userKeywordPreferenceRepository.findAllByUser(user))
                 .thenReturn(List.of(p1, p2));
 
-        // when
         Map<String, Double> result =
                 aggregator.getUserKeywordPreferenceMapByName(user);
 
-        // then
         assertThat(result.get("조용한")).isEqualTo(4.0);
     }
 
-    /**
-     * 3️⃣ MBTI 기본 가중치 + 유저 행동 가중치 병합
-     */
     @Test
     void MBTI_가중치와_유저_행동_가중치가_합산된다() {
-        // given
         User user = mock(User.class);
 
         KeywordWeightAggregator spy = spy(aggregator);
@@ -121,20 +104,14 @@ class KeywordWeightAggregatorTest {
         doReturn(Map.of("분위기좋은", 7.5))
                 .when(spy).getUserKeywordPreferenceMapByName(user);
 
-        // when
         Map<String, Double> result =
                 spy.getCombinedKeywordWeightMapByName(user, "INFJ");
 
-        // then
         assertThat(result.get("분위기좋은")).isEqualTo(27.5);
     }
 
-    /**
-     * 4️⃣ 유저 행동이 없어도 MBTI 단독 계산은 가능해야 한다
-     */
     @Test
     void 유저_행동이_없어도_MBTI_가중치는_유지된다() {
-        // given
         User user = mock(User.class);
 
         KeywordWeightAggregator spy = spy(aggregator);
@@ -145,11 +122,9 @@ class KeywordWeightAggregatorTest {
         doReturn(Map.of())
                 .when(spy).getUserKeywordPreferenceMapByName(user);
 
-        // when
         Map<String, Double> result =
                 spy.getCombinedKeywordWeightMapByName(user, "ISFP");
 
-        // then
         assertThat(result)
                 .containsEntry("힐링", 12.0);
     }
