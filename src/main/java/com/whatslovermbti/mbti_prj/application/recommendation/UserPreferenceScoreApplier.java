@@ -7,9 +7,9 @@
 
     @Component
     public class UserPreferenceScoreApplier {
-        private static final double BONUS_RATIO = 0.3;
+        private static final double BONUS_RATIO = 0.7;
 
-        private static final double MAX_KEYWORD_BONUS = 50.0;
+        private static final double MAX_KEYWORD_BONUS = 40.0;
         private static final double MAX_TOTAL_BONUS = 120.0;
         private static final int TOP_KEYWORD_LIMIT = 3;
 
