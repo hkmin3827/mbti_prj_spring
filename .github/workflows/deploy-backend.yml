@@ -63,7 +63,7 @@ jobs:
           script: |
             cd ~/app
             docker compose pull backend
-            docker compose up -d backend
+            docker compose up -d --force-recreate backend
             docker image prune -f
 
       - name: Remove Runner IP from Security Group
