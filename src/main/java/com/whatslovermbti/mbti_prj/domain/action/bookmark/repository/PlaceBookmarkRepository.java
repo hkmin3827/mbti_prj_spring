@@ -21,7 +21,7 @@ public interface PlaceBookmarkRepository extends JpaRepository<PlaceBookmark, Lo
     void deleteByPlaceId(Long placeId);
 
     @Query("""
-        select new com.whatslovermbti.mbti_prj.dto.place.PlaceBookmarkContextRow(
+        select new com.whatslovermbti.mbti_prj.domain.action.bookmark.dto.PlaceBookmarkContextRow(
             pb.place.id,
             pb.targetMbti
         )

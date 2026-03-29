@@ -28,7 +28,7 @@ public interface UserActionLogRepository extends JpaRepository<UserActionLog, Lo
     void deleteByPlaceId(Long placeId);
 
     @Query("""
-        select new com.whatslovermbti.mbti_prj.dto.place.PlaceViewCountDto(
+        select new com.whatslovermbti.mbti_prj.domain.action.view.dto.PlaceViewCountDto(
             p.id,
             p.name,
             p.address,

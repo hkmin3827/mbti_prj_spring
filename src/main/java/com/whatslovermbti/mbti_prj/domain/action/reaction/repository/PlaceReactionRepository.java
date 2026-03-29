@@ -32,7 +32,7 @@ public interface PlaceReactionRepository extends JpaRepository<PlaceReaction, Lo
     void deleteByPlaceId(Long placeId);
 
     @Query("""
-    select new com.whatslovermbti.mbti_prj.dto.place.PlaceLikedContextRow(
+    select new com.whatslovermbti.mbti_prj.domain.action.reaction.dto.PlaceLikedContextRow(
         pr.place.id,
         pr.targetMbti,
         max(pr.updatedAt)

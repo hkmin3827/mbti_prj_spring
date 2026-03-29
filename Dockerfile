@@ -2,7 +2,7 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-ARG JAR_FILE=build/libs/*.jar
+ARG JAR_FILE=build/libs/mbti_prj-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
 
 ENV SPRING_PROFILES_ACTIVE=prod

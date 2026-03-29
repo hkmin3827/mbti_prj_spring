@@ -39,7 +39,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             String placeName, Pageable pageable);
 
     @Query("""
-    select new com.whatslovermbti.mbti_prj.dto.place.PlaceReviewCountDto(
+    select new com.whatslovermbti.mbti_prj.domain.review.dto.PlaceReviewCountDto(
         p.id,
         p.name,
         p.category,
