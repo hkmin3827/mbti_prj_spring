@@ -42,7 +42,7 @@ public interface PlaceReactionRepository extends JpaRepository<PlaceReaction, Lo
       and pr.type = :type
     group by pr.place.id, pr.targetMbti
     order by max(pr.updatedAt) desc
-""")
+    """)
     List<PlaceLikedContextRow> findLikedContextsByUser(
             @Param("userId") Long userId,
             @Param("type") ActionType type
