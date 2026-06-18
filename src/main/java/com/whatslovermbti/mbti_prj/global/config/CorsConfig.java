@@ -18,7 +18,9 @@ public class CorsConfig {
                 "http://localhost:5173",
                 "https://lovers-mbti.vercel.app"
         ));
-        config.addAllowedHeader("*");
+        config.setAllowedHeaders(List.of(
+                "Authorization", "Content-Type"
+        ));
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
