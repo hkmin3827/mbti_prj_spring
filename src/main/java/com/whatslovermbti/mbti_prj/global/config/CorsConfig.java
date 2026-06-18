@@ -13,7 +13,6 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "https://lovers-mbti.vercel.app"
