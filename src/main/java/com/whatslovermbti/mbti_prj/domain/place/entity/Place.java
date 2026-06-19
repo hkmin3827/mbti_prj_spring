@@ -42,13 +42,6 @@ public class Place {
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<PlaceKeyword> placeKeywords = new ArrayList<>();
 
-    @Transient
-    public List<Keyword> getKeywords() {
-        return placeKeywords.stream()
-                .map(PlaceKeyword::getKeyword)
-                .toList();
-    }
-
     private boolean deleted = false;
 
     private LocalDateTime deletedAt;

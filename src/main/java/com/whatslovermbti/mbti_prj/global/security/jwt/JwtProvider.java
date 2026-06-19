@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +16,17 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
     private final JwtProperties jwtProperties;
+    private Key key;
+
+    @PostConstruct
+    private void init() {
+        key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+    }
 
     public String createToken(Long userId) {
-        String secret = jwtProperties.getSecret();
         long expirationMs = jwtProperties.getExpiration();
-        Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-
         long now = System.currentTimeMillis();
+
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date())
@@ -31,15 +36,7 @@ public class JwtProvider {
     }
 
     public Long getUserId(String token) {
-        String secret = jwtProperties.getSecret();
-        Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
+        Claims claims = parseClaims(token);
         return Long.valueOf(claims.getSubject());
     }
 
@@ -49,10 +46,6 @@ public class JwtProvider {
     }
 
     private Claims parseClaims(String token) {
-        Key key = Keys.hmacShaKeyFor(
-                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
-        );
-
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
