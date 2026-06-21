@@ -34,7 +34,7 @@ public class KakaoMapClient {
             int radius,
             int page,
             String categoryCode
-    ) {ㄴ
+    ) {
         return kakaoWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/search/category.json")
