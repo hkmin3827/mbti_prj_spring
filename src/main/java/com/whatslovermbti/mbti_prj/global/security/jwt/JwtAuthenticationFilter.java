@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             lastLogoutAt.atZone(ZoneId.systemDefault()).toInstant();
 
                     if (issuedInstant.isBefore(logoutInstant)) {
-                        throw new JwtException("로그아웃 이후 발급된 토큰");
+                        throw new JwtException("로그아웃 이전에 발급된 토큰");
                     }
                 }
 

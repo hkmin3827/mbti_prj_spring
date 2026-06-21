@@ -34,7 +34,7 @@ public class KakaoMapClient {
             int radius,
             int page,
             String categoryCode
-    ) {
+    ) {ㄴ
         return kakaoWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/search/category.json")
@@ -46,35 +46,6 @@ public class KakaoMapClient {
                         .queryParam("sort", "distance")
                         .build())
                 .header("Authorization", "KakaoAK " + apiKey)
-                .retrieve()
-                .bodyToMono(KakaoMapResponse.class)
-                .block();
-    }
-
-
-    public KakaoMapResponse searchByKeywordWithLocation(
-            String keyword,
-            double lat,
-            double lng,
-            int radius,
-            int page,
-            int size
-    ) {
-        if (keyword == null || keyword.isBlank()) {
-            throw new IllegalArgumentException("Kakao keyword search requires non-empty keyword");
-        }
-
-        return kakaoWebClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v2/local/search/keyword.json")
-                        .queryParam("query", keyword)
-                        .queryParam("x", lng)
-                        .queryParam("y", lat)
-                        .queryParam("radius", radius)
-                        .queryParam("page", page)
-                        .queryParam("size", size)
-                        .build()
-                )
                 .retrieve()
                 .bodyToMono(KakaoMapResponse.class)
                 .block();

@@ -233,3 +233,13 @@ OCR 결과 score가 verified 되면 "인증됨"을 부여함
 특히 MBTI 기본 가중치와 유저 행동 가중치가
 어떻게 결합되어 추천 점수에 반영되는지를
 서비스 레벨에서 검증하는 데 초점을 두었습니다.
+
+---
+
+## 보완해야하는 사항
+MBTI 프로젝트의 코드 개선점들을 파악하여, 이후의 발전을 위해 기록.
+
+- src/.../application/user/AuthService.java : withdraw 트랜잭션 어노테이션 제거 또는 외부 API 트랜잭션 분리
+- src/.../global/security/oauth/userInfo/GoogleOAuthUserInfo.java, NaverOAuthUserInfo.java... : **providerId(필수값) Null 방어** 커스텀 예외 처리로 ErrorCode 추가, OAuth핸들러에서 onAuthenticationSuccess()에서 try-catch 필요 -> frontBaseUrl + "/oauth/callback?error=" + e.getErrorCode().name() 로 리다이렉트 처리
+- src/.../infra/kakao/KakaoMapClient.java : existsPlace 현재 폐업 시라도 결과 0 건으로, Exception이 떨어지지 않음. 카카오 공식에서 placeId로 검색하는 api 제공하지 않으므로, 장소명 + 주소 등으로 keword검색 후 0건인지 확인 후 sync에서 softdelete. 또는 우회법으로 웹페이지에 GET 요청 보내 404 여부 판별하는 방식으로 해야 함.
+
