@@ -47,7 +47,7 @@ class KeywordWeightAggregatorTest {
         when(w1.getKeyword()).thenReturn(keyword);
         when(w2.getKeyword()).thenReturn(keyword);
 
-        when(mbtiKeywordWeightRepository.findAllByAxes(any(Set.class)))
+        when(mbtiKeywordWeightRepository.findAllByAxes(anySet()))
                 .thenReturn(List.of(w1, w2));
 
         try (MockedStatic<MbtiAxisUtil> mocked = mockStatic(MbtiAxisUtil.class)) {
